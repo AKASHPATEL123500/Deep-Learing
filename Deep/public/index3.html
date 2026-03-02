@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrainLog</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
+
+        :root {
+            --bg: #f5f0e8;
+            --surface: #ede8e0;
+            --card: #fff;
+            --ink: #1a1410;
+            --ink2: #4a4035;
+            --muted: #9a9080;
+            --border: #d8d0c4;
+            --green: #2d6a4f;
+            --gl: #e8f5ee;
+            --amber: #b5451b;
+            --al: #fef3ed;
+            --blue: #1d4e89;
+            --bl: #e8f0fb;
+            --purple: #5b2d8e;
+            --pl: #f0eaf8;
+            --red: #c62828;
+            --rl: #fdecea;
+            --teal: #0d6e6e;
+            --yellow: #b07800;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            font-family: 'Syne', sans-serif;
+            min-height: 100vh
+        }
+
+        .app {
+            display: flex;
+            height: 100vh;
+            overflow: hidden
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 230px;
+            flex-shrink: 0;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto
+        }
+
+        .brand {
+            padding: 20px 16px 16px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .brand-name {
+            font-size: 20px;
+            font-weight: 800;
+            font-style: italic
+        }
+
+        .brand-name span {
+            color: var(--amber)
+        }
+
+        .brand-sub {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 2px;
+            letter-spacing: 1px
+        }
+
+        .nav-sec {
+            padding: 12px 10px 6px
+        }
+
+        .nav-lbl {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            color: var(--muted);
+            letter-spacing: 2px;
+            padding: 0 8px;
+            margin-bottom: 5px
+        }
+
+        .nb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 9px 12px;
+            border-radius: 8px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            color: var(--ink2);
+            transition: all .15s;
+            text-align: left;
+            margin-bottom: 2px
+        }
+
+        .nb:hover {
+            background: var(--border)
+        }
+
+        .nb.active {
+            background: var(--ink);
+            color: #fff
+        }
+
+        .nb .ic {
+            font-size: 15px
+        }
+
+        .nc {
+            margin-left: auto;
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            background: var(--border);
+            color: var(--muted);
+            padding: 2px 6px;
+            border-radius: 10px
+        }
+
+        .nb.active .nc {
+            background: rgba(255, 255, 255, .2);
+            color: rgba(255, 255, 255, .7)
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            padding: 14px;
+            border-top: 1px solid var(--border)
+        }
+
+        .streak-box {
+            background: var(--card);
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            text-align: center
+        }
+
+        .streak-num {
+            font-size: 30px;
+            font-weight: 800;
+            color: var(--amber);
+            line-height: 1
+        }
+
+        .streak-lbl {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 3px
+        }
+
+        /* MAIN */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0
+        }
+
+        .topbar {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0
+        }
+
+        .pg-title {
+            font-size: 18px;
+            font-weight: 700;
+            font-style: italic;
+            flex: 1
+        }
+
+        .search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 7px 12px;
+            width: 200px
+        }
+
+        .search input {
+            border: none;
+            background: none;
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            color: var(--ink);
+            outline: none;
+            width: 100%
+        }
+
+        .search input::placeholder {
+            color: var(--muted)
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 20px
+        }
+
+        /* VIEWS */
+        .view {
+            display: none
+        }
+
+        .view.active {
+            display: block;
+            animation: fadeUp .3s ease
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* FORM */
+        .form-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 16px
+        }
+
+        .form-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .frow {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap
+        }
+
+        .fg {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            min-width: 140px
+        }
+
+        .fg label {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            color: var(--muted);
+            letter-spacing: 1px;
+            text-transform: uppercase
+        }
+
+        .fg input,
+        .fg select,
+        .fg textarea {
+            border: 1px solid var(--border);
+            background: var(--surface);
+            border-radius: 7px;
+            padding: 8px 10px;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            color: var(--ink);
+            outline: none;
+            transition: border-color .2s;
+            resize: none
+        }
+
+        .fg input:focus,
+        .fg select:focus,
+        .fg textarea:focus {
+            border-color: var(--ink)
+        }
+
+        .fg optgroup {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px
+        }
+
+        .stars {
+            display: flex;
+            gap: 3px
+        }
+
+        .star {
+            font-size: 18px;
+            cursor: pointer;
+            opacity: .3;
+            transition: transform .1s;
+            line-height: 1
+        }
+
+        .star.on {
+            opacity: 1
+        }
+
+        .star:hover {
+            transform: scale(1.2)
+        }
+
+        .btn-save {
+            background: var(--ink);
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 9px 18px;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .15s;
+            margin-top: 4px
+        }
+
+        .btn-save:hover {
+            background: #2d2820;
+            transform: translateY(-1px)
+        }
+
+        .btn-clr {
+            background: none;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 9px 14px;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            margin-top: 4px;
+            margin-left: 6px
+        }
+
+        .tip-box {
+            background: var(--al);
+            border: 1px solid #f5c5a8;
+            border-radius: 9px;
+            padding: 11px 14px;
+            font-size: 12px;
+            color: var(--amber)
+        }
+
+        /* ENTRIES */
+        .eheader {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px
+        }
+
+        .ecnt {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .filters {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap
+        }
+
+        .fchip {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--muted);
+            transition: all .15s
+        }
+
+        .fchip:hover {
+            border-color: var(--ink);
+            color: var(--ink)
+        }
+
+        .fchip.on {
+            background: var(--ink);
+            color: #fff;
+            border-color: var(--ink)
+        }
+
+        .entry-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 14px 16px;
+            margin-bottom: 9px;
+            transition: all .2s
+        }
+
+        .entry-card:hover {
+            border-color: #b0a898;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .07)
+        }
+
+        .etop {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 7px
+        }
+
+        .etopic {
+            font-size: 15px;
+            font-weight: 700;
+            flex: 1;
+            line-height: 1.3
+        }
+
+        .emeta {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            flex-shrink: 0
+        }
+
+        .edate {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            color: var(--muted)
+        }
+
+        .tag {
+            display: inline-block;
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            margin-right: 4px;
+            margin-bottom: 5px;
+            border: 1px solid transparent
+        }
+
+        .tag-python {
+            background: var(--gl);
+            color: var(--green);
+            border-color: #b8e0c8
+        }
+
+        .tag-math {
+            background: var(--al);
+            color: var(--amber);
+            border-color: #f5c5a8
+        }
+
+        .tag-ml {
+            background: var(--pl);
+            color: var(--purple);
+            border-color: #d0b8f0
+        }
+
+        .tag-dl {
+            background: var(--bl);
+            color: var(--blue);
+            border-color: #b0c8f0
+        }
+
+        .tag-bca {
+            background: #fff8e6;
+            color: var(--yellow);
+            border-color: #f5d080
+        }
+
+        .tag-other {
+            background: var(--surface);
+            color: var(--muted);
+            border-color: var(--border)
+        }
+
+        .eslbl {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            color: var(--muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 2px
+        }
+
+        .etxt {
+            font-size: 13px;
+            color: var(--ink2);
+            line-height: 1.6
+        }
+
+        .why-chip {
+            display: inline-block;
+            background: var(--al);
+            border: 1px solid #f5c5a8;
+            border-radius: 7px;
+            padding: 6px 10px;
+            margin-top: 6px;
+            font-size: 12px;
+            color: var(--amber);
+            line-height: 1.5
+        }
+
+        .why-chip::before {
+            content: '💡 Why: ';
+            font-weight: 700
+        }
+
+        .eacts {
+            display: flex;
+            gap: 5px;
+            margin-top: 9px;
+            padding-top: 9px;
+            border-top: 1px solid var(--surface)
+        }
+
+        .act {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: none;
+            color: var(--muted);
+            transition: all .15s
+        }
+
+        .act:hover {
+            background: var(--surface)
+        }
+
+        .act.del:hover {
+            background: var(--rl);
+            color: var(--red);
+            border-color: #f5b0b0
+        }
+
+        .act.qz:hover {
+            background: var(--bl);
+            color: var(--blue);
+            border-color: #b0c8f0
+        }
+
+        .empty {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--muted)
+        }
+
+        .empty .ei {
+            font-size: 44px;
+            margin-bottom: 10px
+        }
+
+        .empty p {
+            font-size: 13px;
+            line-height: 1.6
+        }
+
+        /* QUIZ */
+        .qcard {
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+            max-width: 580px;
+            margin: 0 auto
+        }
+
+        .qprog {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            text-align: center;
+            margin-bottom: 14px
+        }
+
+        .qq {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 1.4
+        }
+
+        .qhint {
+            font-size: 13px;
+            color: var(--muted);
+            font-style: italic;
+            margin-bottom: 14px
+        }
+
+        .qreveal {
+            background: var(--gl);
+            border: 1px solid #b8e0c8;
+            border-radius: 9px;
+            padding: 13px;
+            margin-top: 14px;
+            font-size: 13px;
+            color: var(--green);
+            line-height: 1.6;
+            display: none
+        }
+
+        .qreveal.show {
+            display: block;
+            animation: fadeUp .3s ease
+        }
+
+        .btn-rev {
+            background: var(--ink);
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 9px 18px;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            margin-top: 10px
+        }
+
+        .btn-nxt {
+            background: none;
+            color: var(--amber);
+            border: 1px solid var(--amber);
+            border-radius: 7px;
+            padding: 9px 18px;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-left: 6px
+        }
+
+        .btn-nxt:hover {
+            background: var(--al)
+        }
+
+        .noquiz {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted);
+            font-size: 13px;
+            font-style: italic
+        }
+
+        /* STATS */
+        .sgrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 16px
+        }
+
+        .scard {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 16px;
+            text-align: center
+        }
+
+        .snum {
+            font-size: 34px;
+            font-weight: 800;
+            line-height: 1
+        }
+
+        .slbl {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 3px
+        }
+
+        .breakdown {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 16px;
+            margin-bottom: 12px
+        }
+
+        .bd-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px
+        }
+
+        .bd-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 7px
+        }
+
+        .bd-lbl {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--ink2);
+            width: 65px
+        }
+
+        .bd-bar {
+            flex: 1;
+            height: 7px;
+            background: var(--surface);
+            border-radius: 4px;
+            overflow: hidden
+        }
+
+        .bd-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width .5s ease
+        }
+
+        .bd-cnt {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            width: 20px;
+            text-align: right
+        }
+
+        .act-chart {
+            display: flex;
+            gap: 5px;
+            align-items: flex-end;
+            height: 56px;
+            margin-top: 8px
+        }
+
+        /* ROADMAP CHECKLIST */
+        .rphase {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            margin-bottom: 8px;
+            overflow: hidden
+        }
+
+        .rph {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 16px;
+            cursor: pointer;
+            transition: background .15s
+        }
+
+        .rph:hover {
+            background: var(--surface)
+        }
+
+        .rpdot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            flex-shrink: 0
+        }
+
+        .rpname {
+            font-size: 13px;
+            font-weight: 700;
+            flex: 1
+        }
+
+        .rpst {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 10px
+        }
+
+        .st-done {
+            background: var(--gl);
+            color: var(--green)
+        }
+
+        .st-act {
+            background: #fff8e6;
+            color: var(--yellow)
+        }
+
+        .st-todo {
+            background: var(--surface);
+            color: var(--muted)
+        }
+
+        .rpbody {
+            display: none;
+            padding: 0 16px 12px;
+            border-top: 1px solid var(--surface)
+        }
+
+        .rpbody.open {
+            display: block
+        }
+
+        .rptopic {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 0;
+            font-size: 12px;
+            color: var(--ink2);
+            border-bottom: 1px solid var(--surface)
+        }
+
+        .tck {
+            cursor: pointer;
+            font-size: 13px
+        }
+
+        .tck-done {
+            text-decoration: line-through;
+            color: var(--muted)
+        }
+
+        /* VISUAL ROADMAP */
+        .vr-page {
+            padding-bottom: 30px
+        }
+
+        .vr-head {
+            font-size: 17px;
+            font-weight: 800;
+            font-style: italic;
+            margin-bottom: 4px
+        }
+
+        .vr-sub {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 18px
+        }
+
+        .vr-legend {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+            padding: 12px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 9px
+        }
+
+        .vl-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: var(--ink2)
+        }
+
+        .vl-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            flex-shrink: 0
+        }
+
+        .vr-line {
+            position: relative;
+            padding-left: 26px
+        }
+
+        .vr-line::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #2d6a4f, #b5451b, #1d4e89, #5b2d8e, #b5451b, #0d6e6e, #6b3fa0, #7a4010);
+            border-radius: 2px
+        }
+
+        .vr-ph {
+            position: relative;
+            margin-bottom: 8px
+        }
+
+        .vr-dot-pin {
+            position: absolute;
+            left: -20px;
+            top: 17px;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            border: 2px solid var(--bg);
+            z-index: 1
+        }
+
+        .vr-pcard {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            overflow: hidden;
+            transition: box-shadow .2s
+        }
+
+        .vr-pcard:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .07)
+        }
+
+        .vr-ph-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 15px;
+            cursor: pointer;
+            user-select: none
+        }
+
+        .vr-icon {
+            font-size: 20px;
+            flex-shrink: 0
+        }
+
+        .vr-info {
+            flex: 1
+        }
+
+        .vr-pname {
+            font-size: 14px;
+            font-weight: 700
+        }
+
+        .vr-pmeta {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 1px
+        }
+
+        .vr-right {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            flex-shrink: 0
+        }
+
+        .vr-badge {
+            font-family: 'DM Mono', monospace;
+            font-size: 10px;
+            padding: 3px 9px;
+            border-radius: 20px;
+            background: var(--surface);
+            color: var(--muted)
+        }
+
+        .vr-badge.done {
+            background: var(--gl);
+            color: var(--green)
+        }
+
+        .vr-badge.prog {
+            background: #fff8e6;
+            color: var(--yellow)
+        }
+
+        .vr-chev {
+            font-size: 11px;
+            color: var(--muted);
+            transition: transform .2s
+        }
+
+        .vr-chev.open {
+            transform: rotate(90deg)
+        }
+
+        .vr-pbar-wrap {
+            height: 3px;
+            background: var(--surface);
+            margin: 0 15px;
+            border-radius: 2px;
+            overflow: hidden
+        }
+
+        .vr-pbar {
+            height: 100%;
+            border-radius: 2px;
+            transition: width .6s ease
+        }
+
+        .vr-note {
+            margin: 8px 15px 0;
+            padding: 8px 11px;
+            background: var(--al);
+            border: 1px solid #f5c5a8;
+            border-radius: 7px;
+            font-size: 12px;
+            color: var(--amber)
+        }
+
+        .vr-grid {
+            display: none;
+            padding: 12px 15px 14px;
+            border-top: 1px solid var(--surface);
+            grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+            gap: 6px
+        }
+
+        .vr-grid.open {
+            display: grid;
+            animation: fadeUp .25s ease
+        }
+
+        .vr-week-lbl {
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            color: var(--muted);
+            padding: 5px 0 3px;
+            letter-spacing: .5px;
+            grid-column: 1/-1
+        }
+
+        .vr-chip {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 7px 9px;
+            cursor: pointer;
+            transition: all .15s;
+            font-size: 12px;
+            color: var(--ink2)
+        }
+
+        .vr-chip:hover {
+            border-color: #b0a898;
+            background: var(--card)
+        }
+
+        .vr-chip.done {
+            background: var(--gl);
+            border-color: #b8e0c8
+        }
+
+        .vr-chip.done .vct {
+            text-decoration: line-through;
+            color: var(--muted)
+        }
+
+        .vci {
+            font-size: 12px;
+            flex-shrink: 0
+        }
+
+        .vct {
+            flex: 1;
+            line-height: 1.3
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--ink);
+            color: #fff;
+            padding: 11px 16px;
+            border-radius: 9px;
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all .3s;
+            pointer-events: none;
+            z-index: 999
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        @media(max-width:600px) {
+            .app {
+                flex-direction: column;
+                height: auto
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto
+            }
+
+            .sidebar-bottom {
+                display: none
+            }
+
+            .main {
+                height: auto
+            }
+
+            .content {
+                height: auto
+            }
+
+            .vr-grid {
+                grid-template-columns: 1fr 1fr
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+
+        <div class="sidebar">
+            <div class="brand">
+                <div class="brand-name">Brain<span>Log</span></div>
+                <div class="brand-sub">MY LEARNING JOURNAL</div>
+            </div>
+            <div class="nav-sec">
+                <div class="nav-lbl">Menu</div>
+                <button class="nb active" id="nb-log" onclick="gotoView('log')"><span class="ic">📝</span> Add
+                    Entry</button>
+                <button class="nb" id="nb-entries" onclick="gotoView('entries')"><span class="ic">📚</span> All Entries
+                    <span class="nc" id="cnt-badge">0</span></button>
+                <button class="nb" id="nb-quiz" onclick="gotoView('quiz')"><span class="ic">🧠</span> Self Quiz</button>
+                <button class="nb" id="nb-stats" onclick="gotoView('stats')"><span class="ic">📊</span> Stats</button>
+                <button class="nb" id="nb-roadmap" onclick="gotoView('roadmap')"><span class="ic">🗺️</span>
+                    Roadmap</button>
+                <button class="nb" id="nb-visual" onclick="gotoView('visual')"><span class="ic">🎯</span> Visual
+                    Map</button>
+            </div>
+            <div class="sidebar-bottom">
+                <div class="streak-box">
+                    <div class="streak-num" id="streak-el">0</div>
+                    <div class="streak-lbl">DAY STREAK 🔥</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main">
+            <div class="topbar">
+                <div class="pg-title" id="pg-title">Add New Entry</div>
+                <div class="search">
+                    <span style="color:var(--muted);font-size:13px">⌕</span>
+                    <input type="text" placeholder="Search..." id="search-inp" oninput="doRenderEntries()">
+                </div>
+            </div>
+
+            <div class="content">
+
+                <!-- ADD -->
+                <div class="view active" id="view-log">
+                    <div class="form-card">
+                        <div class="form-title">✏️ Aaj Kya Seekha?</div>
+                        <div class="frow">
+                            <div class="fg" style="flex:2">
+                                <label>Topic / Concept</label>
+                                <input type="text" id="in-topic" placeholder="e.g. Python Decorators...">
+                            </div>
+                            <div class="fg">
+                                <label>Category</label>
+                                <select id="in-cat">
+                                    <option value="python">🐍 Python</option>
+                                    <option value="math">📐 Mathematics</option>
+                                    <option value="ml">🤖 Machine Learning</option>
+                                    <option value="dl">🧠 Deep Learning</option>
+                                    <option value="bca">🎓 BCA Syllabus</option>
+                                    <option value="other">📌 Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="frow">
+                            <div class="fg">
+                                <label>Difficulty</label>
+                                <div class="stars">
+                                    <span class="star on" onclick="setDiff(1)">⭐</span>
+                                    <span class="star" onclick="setDiff(2)">⭐</span>
+                                    <span class="star" onclick="setDiff(3)">⭐</span>
+                                    <span class="star" onclick="setDiff(4)">⭐</span>
+                                    <span class="star" onclick="setDiff(5)">⭐</span>
+                                </div>
+                            </div>
+                            <div class="fg">
+                                <label>Phase / Section</label>
+                                <select id="in-phase">
+                                    <optgroup label="🐍 Python (Weeks 1-3)">
+                                        <option value="python-basics">Python — Basics (Week 1)</option>
+                                        <option value="python-advanced">Python — Advanced (Week 2)</option>
+                                        <option value="python-mastery">Python — Mastery (Week 3)</option>
+                                    </optgroup>
+                                    <optgroup label="📐 Mathematics">
+                                        <option value="math-linalg">Math — Linear Algebra</option>
+                                        <option value="math-calc">Math — Calculus</option>
+                                        <option value="math-stats">Math — Probability & Stats</option>
+                                    </optgroup>
+                                    <optgroup label="🔬 DL Phases">
+                                        <option value="phase1">Phase 1 — Data Science</option>
+                                        <option value="phase2">Phase 2 — ML Basics</option>
+                                        <option value="phase3">Phase 3 — Neural Networks</option>
+                                        <option value="phase4">Phase 4 — CNN</option>
+                                        <option value="phase5">Phase 5 — NLP</option>
+                                        <option value="phase6">Phase 6 — Advanced</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="fg" style="margin-bottom:10px">
+                            <label>Kya Seekha — Apne Words Mein</label>
+                            <textarea id="in-learned" rows="3"
+                                placeholder="Samjhao jaise kisi ko padha rahe ho..."></textarea>
+                        </div>
+                        <div class="fg" style="margin-bottom:10px">
+                            <label>💡 WHY — Ye Concept Kyun Exist Karta Hai?</label>
+                            <textarea id="in-why" rows="2" placeholder="Kaunsi problem solve karta hai?"></textarea>
+                        </div>
+                        <div class="fg" style="margin-bottom:12px">
+                            <label>Code Example (Optional)</label>
+                            <textarea id="in-code" rows="2" placeholder="# ek chhota example..."
+                                style="font-family:'DM Mono',monospace;font-size:12px"></textarea>
+                        </div>
+                        <button class="btn-save" onclick="doAddEntry()">✓ Save Entry</button>
+                        <button class="btn-clr" onclick="doClearForm()">Clear</button>
+                    </div>
+                    <div class="tip-box">💡 <strong>Tip:</strong> "WHY" section sabse important hai — concept pakka yaad
+                        rehta hai!</div>
+                </div>
+
+                <!-- ENTRIES -->
+                <div class="view" id="view-entries">
+                    <div class="eheader">
+                        <div class="ecnt" id="ecnt">0 entries</div>
+                        <div class="filters">
+                            <div class="fchip on" onclick="setFilt('all',this)">All</div>
+                            <div class="fchip" onclick="setFilt('python',this)">🐍 Python</div>
+                            <div class="fchip" onclick="setFilt('math',this)">📐 Math</div>
+                            <div class="fchip" onclick="setFilt('ml',this)">🤖 ML</div>
+                            <div class="fchip" onclick="setFilt('dl',this)">🧠 DL</div>
+                            <div class="fchip" onclick="setFilt('bca',this)">🎓 BCA</div>
+                        </div>
+                    </div>
+                    <div id="entries-list"></div>
+                </div>
+
+                <!-- QUIZ -->
+                <div class="view" id="view-quiz">
+                    <div class="qprog" id="qprog"></div>
+                    <div class="qcard" id="qcard">
+                        <div class="noquiz">Pehle entries add karo — phir quiz hoga! 📚</div>
+                    </div>
+                </div>
+
+                <!-- STATS -->
+                <div class="view" id="view-stats">
+                    <div class="sgrid" id="sgrid"></div>
+                    <div class="breakdown">
+                        <div class="bd-title">Category Breakdown</div>
+                        <div id="bd-bars"></div>
+                    </div>
+                    <div class="breakdown">
+                        <div class="bd-title">Last 7 Days</div>
+                        <div class="act-chart" id="act-chart"></div>
+                    </div>
+                </div>
+
+                <!-- ROADMAP CHECKLIST -->
+                <div class="view" id="view-roadmap">
+                    <p style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:14px">
+                        Click to expand — check karo jab topic complete ho</p>
+                    <div id="roadmap-list"></div>
+                </div>
+
+                <!-- VISUAL MAP -->
+                <div class="view" id="view-visual">
+                    <div id="visual-container"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="toast" id="toast-el"></div>
+
+    <script>
+        // ── STATE
+        var entries = [];
+        var roadmapChecks = {};
+        var curFilter = 'all';
+        var curDiff = 1;
+        var quizPool = [];
+        var quizIdx = 0;
+
+        try { entries = JSON.parse( localStorage.getItem( 'bl_entries' ) || '[]' ); } catch ( e ) { }
+        try { roadmapChecks = JSON.parse( localStorage.getItem( 'bl_roadmap' ) || '{}' ); } catch ( e ) { }
+
+        // ── SAVE
+        function doSave() {
+            try { localStorage.setItem( 'bl_entries', JSON.stringify( entries ) ); } catch ( e ) { }
+            updateBadge();
+            updateStreak();
+        }
+        function doSaveRoadmap() {
+            try { localStorage.setItem( 'bl_roadmap', JSON.stringify( roadmapChecks ) ); } catch ( e ) { }
+        }
+
+        // ── NAV
+        var pgTitles = { log: 'Add New Entry', entries: 'All Entries', quiz: 'Self Quiz', stats: 'Stats', roadmap: 'Roadmap', visual: 'Visual Map' };
+        function gotoView( v ) {
+            var views = document.querySelectorAll( '.view' );
+            for ( var i = 0; i < views.length; i++ ) views[ i ].classList.remove( 'active' );
+            var nbs = document.querySelectorAll( '.nb' );
+            for ( var i = 0; i < nbs.length; i++ ) nbs[ i ].classList.remove( 'active' );
+            document.getElementById( 'view-' + v ).classList.add( 'active' );
+            document.getElementById( 'nb-' + v ).classList.add( 'active' );
+            document.getElementById( 'pg-title' ).textContent = pgTitles[ v ];
+            if ( v === 'entries' ) doRenderEntries();
+            if ( v === 'stats' ) doRenderStats();
+            if ( v === 'quiz' ) doStartQuiz();
+            if ( v === 'roadmap' ) doRenderRoadmap();
+            if ( v === 'visual' ) doRenderVisual();
+        }
+
+        // ── DIFFICULTY
+        function setDiff( n ) {
+            curDiff = n;
+            var stars = document.querySelectorAll( '.star' );
+            for ( var i = 0; i < stars.length; i++ ) stars[ i ].classList.toggle( 'on', i < n );
+        }
+
+        // ── ADD ENTRY
+        function doAddEntry() {
+            var topic = document.getElementById( 'in-topic' ).value.trim();
+            var learned = document.getElementById( 'in-learned' ).value.trim();
+            if ( !topic || !learned ) { showToast( '⚠️ Topic aur Kya Seekha zaroori hai!' ); return; }
+            var entry = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                topic: topic,
+                cat: document.getElementById( 'in-cat' ).value,
+                phase: document.getElementById( 'in-phase' ).value,
+                learned: learned,
+                why: document.getElementById( 'in-why' ).value.trim(),
+                code: document.getElementById( 'in-code' ).value.trim(),
+                diff: curDiff
+            };
+            entries.unshift( entry );
+            doSave();
+            doClearForm();
+            showToast( '✓ Entry saved! 🔥' );
+        }
+        function doClearForm() {
+            document.getElementById( 'in-topic' ).value = '';
+            document.getElementById( 'in-learned' ).value = '';
+            document.getElementById( 'in-why' ).value = '';
+            document.getElementById( 'in-code' ).value = '';
+            setDiff( 1 );
+        }
+
+        // ── ENTRIES
+        function setFilt( f, el ) {
+            curFilter = f;
+            var chips = document.querySelectorAll( '.fchip' );
+            for ( var i = 0; i < chips.length; i++ ) chips[ i ].classList.remove( 'on' );
+            el.classList.add( 'on' );
+            doRenderEntries();
+        }
+        function escH( s ) { return s.replace( /&/g, '&amp;' ).replace( /</g, '&lt;' ).replace( />/g, '&gt;' ); }
+        function doRenderEntries() {
+            var q = document.getElementById( 'search-inp' ).value.toLowerCase();
+            var filtered = entries.filter( function ( e ) {
+                if ( curFilter !== 'all' && e.cat !== curFilter ) return false;
+                if ( q && e.topic.toLowerCase().indexOf( q ) < 0 && e.learned.toLowerCase().indexOf( q ) < 0 ) return false;
+                return true;
+            } );
+            document.getElementById( 'ecnt' ).textContent = filtered.length + ' entries';
+            var el = document.getElementById( 'entries-list' );
+            if ( !filtered.length ) {
+                el.innerHTML = '<div class="empty"><div class="ei">📭</div><p>Koi entry nahi mili.<br>Aaj kuch seekho!</p></div>';
+                return;
+            }
+            var catNames = { python: 'Python', math: 'Math', ml: 'ML', dl: 'DL', bca: 'BCA', other: 'Other' };
+            var html = '';
+            for ( var i = 0; i < filtered.length; i++ ) {
+                var e = filtered[ i ];
+                var stars = '';
+                for ( var s = 0; s < e.diff; s++ ) stars += '⭐';
+                var d = new Date( e.date );
+                var dateStr = d.getDate() + ' ' + 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split( ' ' )[ d.getMonth() ] + ' ' + String( d.getFullYear() ).slice( 2 );
+                html += '<div class="entry-card" id="ec-' + e.id + '">';
+                html += '<div class="etop"><div class="etopic">' + escH( e.topic ) + '</div>';
+                html += '<div class="emeta"><span style="font-size:12px;letter-spacing:-2px">' + stars + '</span><span class="edate">' + dateStr + '</span></div></div>';
+                html += '<span class="tag tag-' + e.cat + '">' + ( catNames[ e.cat ] || e.cat ) + '</span>';
+                html += '<div style="margin-top:4px"><div class="eslbl">Kya Seekha</div><div class="etxt">' + escH( e.learned ) + '</div></div>';
+                if ( e.why ) html += '<div class="why-chip">' + escH( e.why ) + '</div>';
+                if ( e.code ) html += '<div style="margin-top:7px"><div class="eslbl">Code</div><pre style="background:var(--surface);border-radius:6px;padding:8px;font-family:\'DM Mono\',monospace;font-size:11px;overflow-x:auto;margin-top:3px">' + escH( e.code ) + '</pre></div>';
+                html += '<div class="eacts">';
+                html += '<button class="act qz" onclick="doQuizFrom(' + e.id + ')">🧠 Quiz Me</button>';
+                html += '<button class="act del" onclick="doDelete(' + e.id + ')">🗑 Delete</button>';
+                html += '</div></div>';
+            }
+            el.innerHTML = html;
+        }
+        function doDelete( id ) {
+            if ( !confirm( 'Delete this entry?' ) ) return;
+            entries = entries.filter( function ( e ) { return e.id !== id; } );
+            doSave();
+            doRenderEntries();
+            showToast( '🗑 Deleted' );
+        }
+
+        // ── QUIZ
+        function doStartQuiz() {
+            quizPool = entries.slice().sort( function () { return Math.random() - .5; } );
+            quizIdx = 0;
+            showQuizCard();
+        }
+        function doQuizFrom( id ) {
+            gotoView( 'quiz' );
+            var found = entries.filter( function ( e ) { return e.id === id; } );
+            var rest = entries.filter( function ( e ) { return e.id !== id; } ).sort( function () { return Math.random() - .5; } );
+            quizPool = found.concat( rest );
+            quizIdx = 0;
+            showQuizCard();
+        }
+        function showQuizCard() {
+            var qcard = document.getElementById( 'qcard' );
+            if ( !quizPool.length ) { qcard.innerHTML = '<div class="noquiz">Pehle entries add karo! 📚</div>'; return; }
+            var e = quizPool[ quizIdx % quizPool.length ];
+            document.getElementById( 'qprog' ).textContent = 'Question ' + ( quizIdx % quizPool.length + 1 ) + ' of ' + quizPool.length;
+            var revHTML = '<div class="qreveal" id="qrev"><strong>Tumne likha tha:</strong><br>' + escH( e.learned );
+            if ( e.why ) revHTML += '<br><br><strong>Why:</strong> ' + escH( e.why );
+            if ( e.code ) revHTML += '<br><br><strong>Code:</strong><br><pre style="font-family:\'DM Mono\',monospace;font-size:11px;margin-top:3px">' + escH( e.code ) + '</pre>';
+            revHTML += '</div>';
+            qcard.innerHTML = '<div class="qq">Explain karo: "' + escH( e.topic ) + '"</div>'
+                + '<div class="qhint">Bina dekhey samjhao... phir reveal karo.</div>'
+                + '<button class="btn-rev" onclick="doReveal()">👁 Reveal</button>'
+                + '<button class="btn-nxt" onclick="doNextQ()">Next →</button>'
+                + revHTML;
+        }
+        function doReveal() { var r = document.getElementById( 'qrev' ); if ( r ) r.classList.add( 'show' ); }
+        function doNextQ() { quizIdx++; showQuizCard(); }
+
+        // ── STATS
+        function doRenderStats() {
+            var total = entries.length;
+            var cats = { python: 0, math: 0, ml: 0, dl: 0, bca: 0, other: 0 };
+            var totDiff = 0;
+            for ( var i = 0; i < entries.length; i++ ) {
+                var c = entries[ i ].cat;
+                cats[ c ] = ( cats[ c ] || 0 ) + 1;
+                totDiff += entries[ i ].diff || 1;
+            }
+            var today = new Date(); today.setHours( 0, 0, 0, 0 );
+            var todayCnt = entries.filter( function ( e ) { var d = new Date( e.date ); d.setHours( 0, 0, 0, 0 ); return d.getTime() === today.getTime(); } ).length;
+            var avg = total ? ( totDiff / total ).toFixed( 1 ) : 0;
+            document.getElementById( 'sgrid' ).innerHTML =
+                '<div class="scard"><div class="snum" style="color:var(--green)">' + total + '</div><div class="slbl">TOTAL ENTRIES</div></div>' +
+                '<div class="scard"><div class="snum" style="color:var(--amber)">' + todayCnt + '</div><div class="slbl">TODAY</div></div>' +
+                '<div class="scard"><div class="snum" style="color:var(--blue)">' + getStreak() + '</div><div class="slbl">STREAK 🔥</div></div>' +
+                '<div class="scard"><div class="snum" style="color:var(--purple)">' + avg + '</div><div class="slbl">AVG DIFFICULTY</div></div>';
+            var colors = { python: '#2d6a4f', math: '#b5451b', ml: '#5b2d8e', dl: '#1d4e89', bca: '#b07800', other: '#9a9080' };
+            var labels = { python: 'Python', math: 'Math', ml: 'ML', dl: 'DL', bca: 'BCA', other: 'Other' };
+            var maxCat = 1;
+            for ( var k in cats ) if ( cats[ k ] > maxCat ) maxCat = cats[ k ];
+            var barsHTML = '';
+            for ( var k in cats ) {
+                barsHTML += '<div class="bd-row"><div class="bd-lbl">' + labels[ k ] + '</div><div class="bd-bar"><div class="bd-fill" style="width:' + Math.round( cats[ k ] / maxCat * 100 ) + '%;background:' + colors[ k ] + '"></div></div><div class="bd-cnt">' + cats[ k ] + '</div></div>';
+            }
+            document.getElementById( 'bd-bars' ).innerHTML = barsHTML;
+            var dayNames = [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ];
+            var chartHTML = '';
+            var dayCounts = [];
+            for ( var i = 6; i >= 0; i-- ) {
+                var d = new Date(); d.setDate( d.getDate() - i ); d.setHours( 0, 0, 0, 0 );
+                var cnt = entries.filter( function ( e ) { var ed = new Date( e.date ); ed.setHours( 0, 0, 0, 0 ); return ed.getTime() === d.getTime(); } ).length;
+                dayCounts.push( { d: d, cnt: cnt } );
+            }
+            var maxDay = 1;
+            for ( var i = 0; i < dayCounts.length; i++ ) if ( dayCounts[ i ].cnt > maxDay ) maxDay = dayCounts[ i ].cnt;
+            for ( var i = 0; i < dayCounts.length; i++ ) {
+                var h = Math.max( 4, Math.round( dayCounts[ i ].cnt / maxDay * 50 ) );
+                chartHTML += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">'
+                    + '<div style="width:100%;height:' + h + 'px;background:' + ( dayCounts[ i ].cnt > 0 ? 'var(--green)' : 'var(--surface)' ) + ';border-radius:3px"></div>'
+                    + '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--muted)">' + dayNames[ dayCounts[ i ].d.getDay() ] + '</div>'
+                    + ( dayCounts[ i ].cnt ? '<div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--ink2)">' + dayCounts[ i ].cnt + '</div>' : '' )
+                    + '</div>';
+            }
+            document.getElementById( 'act-chart' ).innerHTML = chartHTML;
+        }
+
+        // ── ROADMAP CHECKLIST DATA
+        var ROADMAP_DATA = [
+            { id: 'rp-python', name: 'Python Foundation', color: '#2d6a4f', topics: [ 'Variables & Data Types', 'Control Flow — loops/conditions', 'Functions — def, *args, lambda', 'OOP — class, inheritance', 'File Handling & JSON', 'Modules — os, math, random', 'List/Dict Comprehensions', 'Decorators & Generators', 'Advanced OOP + Dunder Methods', 'Type Hints & venv + pip', 'String Manipulation & Regex', 'Git + GitHub basics' ] },
+            { id: 'rp-math', name: 'Mathematics', color: '#b5451b', topics: [ 'Vectors & Scalars', 'Matrix Multiplication & Transpose', 'Dot Product & Norms', 'Derivatives & Chain Rule', 'Partial Derivatives & Gradients', 'Probability Basics — P(A)', 'Conditional Probability & Bayes', 'Mean, Variance, Std Deviation', 'Normal Distribution', 'Correlation & Covariance' ] },
+            { id: 'rp-p1', name: 'Phase 1 — Data Science', color: '#1d4e89', topics: [ 'NumPy Arrays — indexing, slicing', 'NumPy Broadcasting & Math', 'Pandas Series & DataFrame', 'Pandas — clean, merge, groupby', 'Matplotlib — line, bar, hist', 'Seaborn — heatmap, pairplot', 'Full EDA on real dataset' ] },
+            { id: 'rp-p2', name: 'Phase 2 — Machine Learning', color: '#5b2d8e', topics: [ 'ML Types & Workflow', 'Data Preprocessing & Encoding', 'Linear & Logistic Regression', 'Decision Trees & Random Forest', 'XGBoost & LightGBM', 'SVM, KNN, Naive Bayes', 'Evaluation Metrics — F1, ROC', 'Overfitting & Regularization', 'GridSearchCV Tuning' ] },
+            { id: 'rp-p3', name: 'Phase 3 — Neural Networks', color: '#b5451b', topics: [ 'Perceptron & MLP Architecture', 'Activation Functions', 'Forward Propagation', 'Loss Functions', 'Backpropagation & Chain Rule', 'Optimizers — Adam, SGD', 'Keras Sequential & Functional API', 'PyTorch nn.Module & Training Loop', 'Batch Norm & Dropout' ] },
+            { id: 'rp-p4', name: 'Phase 4 — CNN & Vision', color: '#0d6e6e', topics: [ 'Convolution Operation', 'Pooling & Padding', 'ResNet, EfficientNet Architectures', 'Transfer Learning', 'Data Augmentation — Albumentations', 'YOLOv8 Object Detection', 'U-Net Segmentation' ] },
+            { id: 'rp-p5', name: 'Phase 5 — NLP & Transformers', color: '#6b3fa0', topics: [ 'Text Preprocessing & Tokenization', 'Word2Vec & GloVe Embeddings', 'LSTM & GRU', 'Attention Mechanism', 'Transformer Architecture', 'BERT Fine-tuning', 'HuggingFace pipeline() & Trainer' ] },
+            { id: 'rp-p6', name: 'Phase 6 — Advanced + Deploy', color: '#7a4010', topics: [ 'Autoencoders & VAE', 'GANs — DCGAN, StyleGAN', 'Diffusion Models', 'LoRA & QLoRA Fine-tuning', 'FastAPI + Gradio Serving', 'Docker Basics', 'MLflow Experiment Tracking' ] }
+        ];
+
+        function doRenderRoadmap() {
+            var html = '';
+            for ( var i = 0; i < ROADMAP_DATA.length; i++ ) {
+                var p = ROADMAP_DATA[ i ];
+                var done = 0;
+                for ( var j = 0; j < p.topics.length; j++ ) if ( roadmapChecks[ p.id + '-' + j ] ) done++;
+                var pct = Math.round( done / p.topics.length * 100 );
+                var stClass = pct === 100 ? 'st-done' : pct > 0 ? 'st-act' : 'st-todo';
+                var stText = pct === 100 ? '✓ Done' : pct > 0 ? ( pct + '% done' ) : 'Not started';
+                html += '<div class="rphase"><div class="rph" onclick="toggleRPh(\'rb-' + p.id + '\')">';
+                html += '<div class="rpdot" style="background:' + p.color + '"></div>';
+                html += '<div class="rpname">' + p.name + '</div>';
+                html += '<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--muted);margin-right:7px">' + done + '/' + p.topics.length + '</div>';
+                html += '<div class="rpst ' + stClass + '">' + stText + '</div></div>';
+                html += '<div class="rpbody" id="rb-' + p.id + '">';
+                for ( var j = 0; j < p.topics.length; j++ ) {
+                    var checked = roadmapChecks[ p.id + '-' + j ];
+                    html += '<div class="rptopic"><span class="tck" onclick="toggleRTopic(\'' + p.id + '\',' + j + ',this,\'rt-' + p.id + '-' + j + '\')">' + ( checked ? '✅' : '⬜' ) + '</span>';
+                    html += '<span id="rt-' + p.id + '-' + j + '" ' + ( checked ? 'class="tck-done"' : '' ) + '>' + p.topics[ j ] + '</span></div>';
+                }
+                html += '</div></div>';
+            }
+            document.getElementById( 'roadmap-list' ).innerHTML = html;
+        }
+        function toggleRPh( id ) { var el = document.getElementById( id ); el.classList.toggle( 'open' ); }
+        function toggleRTopic( phaseId, idx, checkEl, textId ) {
+            var key = phaseId + '-' + idx;
+            roadmapChecks[ key ] = !roadmapChecks[ key ];
+            doSaveRoadmap();
+            checkEl.textContent = roadmapChecks[ key ] ? '✅' : '⬜';
+            var tel = document.getElementById( textId );
+            if ( tel ) tel.className = roadmapChecks[ key ] ? 'tck-done' : '';
+            if ( roadmapChecks[ key ] ) showToast( '✓ Topic complete! 🎉' );
+        }
+
+        // ── VISUAL ROADMAP DATA
+        var VISUAL_DATA = [
+            {
+                id: 'v-python', icon: '🐍', name: 'Python Foundation', dur: '3 Weeks', color: '#2d6a4f', note: null,
+                weeks: [
+                    { lbl: 'Week 1 — Basics', topics: [ 'Variables & Data Types', 'Operators & Type Conversion', 'if/elif/else Conditions', 'For & While Loops', 'break / continue / pass' ] },
+                    { lbl: 'Week 2 — Functions & OOP', topics: [ 'Functions — def, return, *args', 'Lambda & map/filter', 'Classes & Objects — __init__', 'Inheritance & super()', 'Decorators & Generators' ] },
+                    { lbl: 'Week 3 — Power Python', topics: [ 'List/Dict Comprehensions', 'File Handling & JSON', 'Modules — os, math, random', 'Regex Basics', 'Type Hints & venv', 'Git + GitHub' ] }
+                ]
+            },
+            {
+                id: 'v-math', icon: '📐', name: 'Mathematics (3Blue1Brown se dekho!)', dur: 'Python ke saath parallel', color: '#b5451b',
+                note: '⚡ Ye Python ke saath daily 30 min chalega — heavy theory nahi, sirf concept level!',
+                weeks: [
+                    { lbl: 'Linear Algebra', topics: [ 'Vectors & Scalars', 'Matrix Multiplication', 'Transpose & Inverse', 'Dot Product', 'Norms — L1 & L2' ] },
+                    { lbl: 'Calculus', topics: [ 'Derivative — slope kya hai', 'Chain Rule — backprop ka base!', 'Partial Derivatives', 'Gradient concept', 'Minima/Maxima — loss minimize' ] },
+                    { lbl: 'Probability & Stats', topics: [ 'Probability — P(A)', 'Conditional Probability', 'Bayes Theorem', 'Mean, Variance, Std Dev', 'Normal Distribution', 'Correlation' ] }
+                ]
+            },
+            {
+                id: 'v-p1', icon: '📊', name: 'Phase 1 — Data Science Foundation', dur: '2-3 Months', color: '#1d4e89', note: null,
+                weeks: [
+                    { lbl: 'NumPy', topics: [ 'np.array — 1D/2D/3D', 'Indexing & Slicing', 'Broadcasting', 'Matrix Operations', 'np.linalg basics' ] },
+                    { lbl: 'Pandas', topics: [ 'Series & DataFrame', 'read_csv, info, describe', 'loc & iloc Selection', 'Boolean Filtering', 'groupby & merge', 'pd.get_dummies' ] },
+                    { lbl: 'Visualization', topics: [ 'Matplotlib — line/bar/hist', 'Seaborn — heatmap/pairplot', 'Correlation Matrix', 'Full EDA Project' ] }
+                ]
+            },
+            {
+                id: 'v-p2', icon: '🤖', name: 'Phase 2 — Machine Learning', dur: '2-3 Months', color: '#5b2d8e', note: null,
+                weeks: [
+                    { lbl: 'ML Concepts', topics: [ 'Supervised vs Unsupervised', 'ML Workflow — 10 steps', 'Data Preprocessing', 'Train/Test Split', 'Cross-Validation' ] },
+                    { lbl: 'Algorithms', topics: [ 'Linear Regression', 'Logistic Regression', 'Decision Trees', 'Random Forest', 'XGBoost', 'SVM & KNN', 'Naive Bayes' ] },
+                    { lbl: 'Evaluation', topics: [ 'Confusion Matrix', 'Precision, Recall, F1', 'ROC-AUC Curve', 'Overfitting & Regularization', 'GridSearchCV' ] }
+                ]
+            },
+            {
+                id: 'v-p3', icon: '🧠', name: 'Phase 3 — Neural Networks', dur: '3-4 Months', color: '#b5451b', note: null,
+                weeks: [
+                    { lbl: 'NN Fundamentals', topics: [ 'MLP Architecture', 'Activation Functions', 'Forward Propagation', 'Loss Functions', 'Backpropagation', 'Optimizers — Adam/SGD' ] },
+                    { lbl: 'Keras/TF', topics: [ 'Tensors basics', 'Sequential API', 'model.compile & fit', 'Callbacks', 'Model save/load' ] },
+                    { lbl: 'PyTorch', topics: [ 'torch.Tensor + autograd', 'nn.Module class', 'Training Loop', 'DataLoader & Dataset', 'Save/load state_dict' ] }
+                ]
+            },
+            {
+                id: 'v-p4', icon: '📸', name: 'Phase 4 — CNN & Computer Vision', dur: '2-3 Months', color: '#0d6e6e', note: null,
+                weeks: [
+                    { lbl: 'CNN Basics', topics: [ 'Convolution Operation', 'Stride & Padding', 'Pooling Layers', 'Feature Maps' ] },
+                    { lbl: 'Architectures', topics: [ 'ResNet — skip connections', 'EfficientNet', 'MobileNet', 'Transfer Learning', 'Fine-tuning' ] },
+                    { lbl: 'Applications', topics: [ 'YOLOv8 Detection', 'Data Augmentation', 'U-Net Segmentation', 'Roboflow Datasets' ] }
+                ]
+            },
+            {
+                id: 'v-p5', icon: '💬', name: 'Phase 5 — NLP & Transformers', dur: '2-3 Months', color: '#6b3fa0', note: null,
+                weeks: [
+                    { lbl: 'Text Processing', topics: [ 'Tokenization & Lemmatization', 'Bag of Words, TF-IDF', 'Word2Vec & GloVe', 'spaCy basics' ] },
+                    { lbl: 'RNN/LSTM', topics: [ 'RNN — sequential data', 'LSTM Gates', 'GRU', 'Seq2Seq', 'Attention Mechanism' ] },
+                    { lbl: 'Transformers', topics: [ 'Self-Attention Q/K/V', 'Multi-Head Attention', 'BERT — bidirectional', 'GPT — autoregressive', 'HuggingFace pipeline()', 'Fine-tune BERT' ] }
+                ]
+            },
+            {
+                id: 'v-p6', icon: '🚀', name: 'Phase 6 — Advanced + Deployment', dur: '2-3 Months', color: '#7a4010', note: null,
+                weeks: [
+                    { lbl: 'Generative AI', topics: [ 'Autoencoders & VAE', 'GANs — Generator/Discriminator', 'Diffusion Models', 'Stable Diffusion', 'LLaMA, Mistral — open LLMs', 'RAG — Retrieval Augmented Gen' ] },
+                    { lbl: 'Fine-tuning', topics: [ 'LoRA — Low Rank Adaptation', 'QLoRA — 4-bit training', 'HuggingFace PEFT', 'Ollama — local LLMs' ] },
+                    { lbl: 'MLOps', topics: [ 'FastAPI model serving', 'Gradio + Streamlit', 'HuggingFace Spaces', 'Docker basics', 'MLflow tracking' ] }
+                ]
+            }
+        ];
+
+        function doRenderVisual() {
+            var totalTopics = 0;
+            for ( var i = 0; i < VISUAL_DATA.length; i++ )
+                for ( var j = 0; j < VISUAL_DATA[ i ].weeks.length; j++ )
+                    totalTopics += VISUAL_DATA[ i ].weeks[ j ].topics.length;
+
+            var doneTotal = 0;
+            for ( var k in roadmapChecks ) if ( k.indexOf( 'v-' ) == 0 && roadmapChecks[ k ] ) doneTotal++;
+
+            var legendHTML = '';
+            for ( var i = 0; i < VISUAL_DATA.length; i++ ) {
+                legendHTML += '<div class="vl-item"><div class="vl-dot" style="background:' + VISUAL_DATA[ i ].color + '"></div><span>' + VISUAL_DATA[ i ].icon + ' ' + VISUAL_DATA[ i ].name.split( ' ' ).slice( 0, 2 ).join( ' ' ) + '</span></div>';
+            }
+
+            var phasesHTML = '';
+            for ( var i = 0; i < VISUAL_DATA.length; i++ ) {
+                var ph = VISUAL_DATA[ i ];
+                var allTopics = [];
+                for ( var j = 0; j < ph.weeks.length; j++ )
+                    for ( var t = 0; t < ph.weeks[ j ].topics.length; t++ )
+                        allTopics.push( ph.weeks[ j ].topics[ t ] );
+                var done = 0;
+                for ( var t = 0; t < allTopics.length; t++ ) if ( roadmapChecks[ 'v-' + ph.id + '-' + t ] ) done++;
+                var pct = allTopics.length ? Math.round( done / allTopics.length * 100 ) : 0;
+                var badgeClass = pct === 100 ? 'done' : pct > 0 ? 'prog' : '';
+                var badgeText = pct === 100 ? '✓ Complete' : pct > 0 ? ( pct + '% done' ) : 'Not started';
+
+                var topicGlobalIdx = 0;
+                var weeksHTML = '';
+                for ( var j = 0; j < ph.weeks.length; j++ ) {
+                    weeksHTML += '<div class="vr-week-lbl">' + ph.weeks[ j ].lbl + '</div>';
+                    for ( var t = 0; t < ph.weeks[ j ].topics.length; t++ ) {
+                        var key = 'v-' + ph.id + '-' + topicGlobalIdx;
+                        var isChecked = roadmapChecks[ key ] ? true : false;
+                        weeksHTML += '<div class="vr-chip' + ( isChecked ? ' done' : '' ) + '" onclick="toggleVChip(\'' + key + '\',this)">'
+                            + '<span class="vci">' + ( isChecked ? '✅' : '⬜' ) + '</span>'
+                            + '<span class="vct">' + ph.weeks[ j ].topics[ t ] + '</span></div>';
+                        topicGlobalIdx++;
+                    }
+                }
+
+                phasesHTML += '<div class="vr-ph">'
+                    + '<div class="vr-dot-pin" style="background:' + ph.color + '"></div>'
+                    + '<div class="vr-pcard">'
+                    + '<div class="vr-ph-header" onclick="toggleVGrid(\'vg-' + ph.id + '\',\'vc-' + ph.id + '\')">'
+                    + '<div class="vr-icon">' + ph.icon + '</div>'
+                    + '<div class="vr-info"><div class="vr-pname">' + ph.name + '</div><div class="vr-pmeta">' + ph.dur + ' &bull; ' + done + '/' + allTopics.length + ' topics</div></div>'
+                    + '<div class="vr-right"><div class="vr-badge ' + badgeClass + '">' + badgeText + '</div><div class="vr-chev" id="vc-' + ph.id + '">▶</div></div>'
+                    + '</div>'
+                    + '<div class="vr-pbar-wrap"><div class="vr-pbar" id="vbar-' + ph.id + '" style="width:' + pct + '%;background:' + ph.color + '"></div></div>'
+                    + ( ph.note ? '<div class="vr-note">' + ph.note + '</div>' : '' )
+                    + '<div class="vr-grid" id="vg-' + ph.id + '">' + weeksHTML + '</div>'
+                    + '</div></div>';
+            }
+
+            document.getElementById( 'visual-container' ).innerHTML =
+                '<div class="vr-page">'
+                + '<div class="vr-head">Tera Complete DL Journey 🗺️</div>'
+                + '<div class="vr-sub">Har topic pe click karo jab complete ho &bull; ' + doneTotal + '/' + totalTopics + ' topics done</div>'
+                + '<div class="vr-legend"><div style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--muted);width:100%;letter-spacing:1px;margin-bottom:3px">LEGEND</div>' + legendHTML + '</div>'
+                + '<div class="vr-line">' + phasesHTML + '</div>'
+                + '</div>';
+        }
+
+        function toggleVGrid( gridId, chevId ) {
+            var g = document.getElementById( gridId );
+            var c = document.getElementById( chevId );
+            if ( !g || !c ) return;
+            g.classList.toggle( 'open' );
+            c.classList.toggle( 'open' );
+        }
+
+        function toggleVChip( key, el ) {
+            roadmapChecks[ key ] = !roadmapChecks[ key ];
+            doSaveRoadmap();
+            var checked = roadmapChecks[ key ];
+            el.classList.toggle( 'done', checked );
+            el.querySelector( '.vci' ).textContent = checked ? '✅' : '⬜';
+            el.querySelector( '.vct' ).style.textDecoration = checked ? 'line-through' : '';
+            // update just this phase bar
+            var parts = key.split( '-' );
+            var phId = parts[ 0 ] + '-' + parts[ 1 ] + '-' + parts[ 2 ];
+            var ph = null;
+            for ( var i = 0; i < VISUAL_DATA.length; i++ ) if ( VISUAL_DATA[ i ].id === phId ) { ph = VISUAL_DATA[ i ]; break; }
+            if ( ph ) {
+                var allTopics = 0;
+                for ( var j = 0; j < ph.weeks.length; j++ ) allTopics += ph.weeks[ j ].topics.length;
+                var done = 0;
+                for ( var t = 0; t < allTopics; t++ ) if ( roadmapChecks[ 'v-' + ph.id + '-' + t ] ) done++;
+                var pct = Math.round( done / allTopics * 100 );
+                var bar = document.getElementById( 'vbar-' + ph.id );
+                if ( bar ) bar.style.width = pct + '%';
+                var badge = el.closest( '.vr-pcard' ).querySelector( '.vr-badge' );
+                if ( badge ) { badge.className = 'vr-badge' + ( pct === 100 ? ' done' : pct > 0 ? ' prog' : '' ); badge.textContent = pct === 100 ? '✓ Complete' : pct > 0 ? ( pct + '% done' ) : 'Not started'; }
+                var meta = el.closest( '.vr-pcard' ).querySelector( '.vr-pmeta' );
+                if ( meta ) meta.textContent = ph.dur + ' \u2022 ' + done + '/' + allTopics + ' topics';
+            }
+            if ( checked ) showToast( '✓ Topic done! Aage badho! 🎉' );
+        }
+
+        // ── STREAK
+        function getStreak() {
+            if ( !entries.length ) return 0;
+            var dates = [];
+            for ( var i = 0; i < entries.length; i++ ) {
+                var d = new Date( entries[ i ].date ); d.setHours( 0, 0, 0, 0 );
+                var ds = d.toDateString();
+                if ( dates.indexOf( ds ) < 0 ) dates.push( ds );
+            }
+            dates.sort( function ( a, b ) { return new Date( b ) - new Date( a ); } );
+            var streak = 0, check = new Date(); check.setHours( 0, 0, 0, 0 );
+            for ( var i = 0; i < dates.length; i++ ) {
+                var ed = new Date( dates[ i ] ); ed.setHours( 0, 0, 0, 0 );
+                var diff = ( check - ed ) / 86400000;
+                if ( diff <= 1 ) { streak++; check = ed; } else break;
+            }
+            return streak;
+        }
+        function updateStreak() { document.getElementById( 'streak-el' ).textContent = getStreak(); }
+        function updateBadge() { document.getElementById( 'cnt-badge' ).textContent = entries.length; }
+
+        // ── TOAST
+        function showToast( msg ) {
+            var t = document.getElementById( 'toast-el' );
+            t.textContent = msg; t.classList.add( 'show' );
+            setTimeout( function () { t.classList.remove( 'show' ); }, 2500 );
+        }
+
+        // ── INIT
+        updateBadge();
+        updateStreak();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python 21-Day Plan</title>
+    <style>
+        :root {
+            --bg: #0d0d14;
+            --surface: #14141f;
+            --card: #1c1c2a;
+            --border: #2a2a40;
+            --green: #00f5a0;
+            --purple: #7c3aed;
+            --yellow: #fbbf24;
+            --red: #ef4444;
+            --blue: #3b82f6;
+            --orange: #f97316;
+            --pink: #ec4899;
+            --text: #e8e8f0;
+            --muted: #6b6b8a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            padding: 20px 16px 60px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 28px 0 36px;
+        }
+
+        .header h1 {
+            font-size: clamp(26px, 5vw, 44px);
+            font-weight: 800;
+        }
+
+        .header h1 span {
+            color: var(--green);
+        }
+
+        .header p {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .header::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background: var(--green);
+            margin: 14px auto 0;
+            border-radius: 2px;
+        }
+
+        /* WEEK TABS */
+        .week-tabs {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .wtab {
+            padding: 10px 24px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--muted);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .wtab:hover {
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .wtab.active {
+            background: rgba(0, 245, 160, 0.1);
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .wtab.w2.active {
+            background: rgba(124, 58, 237, 0.1);
+            border-color: var(--purple);
+            color: #a78bfa;
+        }
+
+        .wtab.w3.active {
+            background: rgba(251, 191, 36, 0.1);
+            border-color: var(--yellow);
+            color: var(--yellow);
+        }
+
+        /* WEEK PANEL */
+        .week-panel {
+            display: none;
+            animation: fadeUp 0.3s ease;
+        }
+
+        .week-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* WEEK HEADER */
+        .week-banner {
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .wb-1 {
+            background: linear-gradient(135deg, rgba(0, 245, 160, 0.12), rgba(0, 200, 130, 0.05));
+            border: 1px solid rgba(0, 245, 160, 0.25);
+        }
+
+        .wb-2 {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(100, 40, 200, 0.05));
+            border: 1px solid rgba(124, 58, 237, 0.25);
+        }
+
+        .wb-3 {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.12), rgba(220, 160, 20, 0.05));
+            border: 1px solid rgba(251, 191, 36, 0.25);
+        }
+
+        .wb-title {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .wb-subtitle {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .wb-badge {
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .badge-1 {
+            background: rgba(0, 245, 160, 0.15);
+            color: var(--green);
+            border: 1px solid rgba(0, 245, 160, 0.3);
+        }
+
+        .badge-2 {
+            background: rgba(124, 58, 237, 0.15);
+            color: #a78bfa;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+        }
+
+        .badge-3 {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--yellow);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        /* DAY CARD */
+        .day-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: border-color 0.2s, transform 0.2s;
+            cursor: pointer;
+        }
+
+        .day-card:hover {
+            transform: translateX(3px);
+        }
+
+        .day-card.w1:hover {
+            border-color: rgba(0, 245, 160, 0.4);
+        }
+
+        .day-card.w2:hover {
+            border-color: rgba(124, 58, 237, 0.4);
+        }
+
+        .day-card.w3:hover {
+            border-color: rgba(251, 191, 36, 0.4);
+        }
+
+        .day-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+        }
+
+        .day-num {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .dn-1 {
+            background: rgba(0, 245, 160, 0.12);
+            color: var(--green);
+            border: 1px solid rgba(0, 245, 160, 0.2);
+        }
+
+        .dn-2 {
+            background: rgba(124, 58, 237, 0.12);
+            color: #a78bfa;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+        }
+
+        .dn-3 {
+            background: rgba(251, 191, 36, 0.12);
+            color: var(--yellow);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+        }
+
+        .dn-rest {
+            background: rgba(107, 107, 138, 0.12);
+            color: var(--muted);
+            border: 1px solid rgba(107, 107, 138, 0.2);
+        }
+
+        .day-info {
+            flex: 1;
+        }
+
+        .day-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .day-topic {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .day-time {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: var(--surface);
+            color: var(--muted);
+            flex-shrink: 0;
+        }
+
+        /* DAY DETAIL (expanded) */
+        .day-detail {
+            display: none;
+            padding: 0 18px 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .day-detail.open {
+            display: block;
+            animation: fadeUp 0.2s ease;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .detail-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .db-label {
+            font-size: 10px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .db-items {
+            list-style: none;
+        }
+
+        .db-items li {
+            font-size: 13px;
+            color: #b8b8d0;
+            padding: 3px 0;
+            padding-left: 12px;
+            position: relative;
+        }
+
+        .db-items li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--green);
+            font-size: 10px;
+            top: 5px;
+        }
+
+        .db-items.purple li::before {
+            color: #a78bfa;
+        }
+
+        .db-items.yellow li::before {
+            color: var(--yellow);
+        }
+
+        .practice-box {
+            margin-top: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(0, 245, 160, 0.05);
+            border: 1px solid rgba(0, 245, 160, 0.15);
+        }
+
+        .practice-box.w2 {
+            background: rgba(124, 58, 237, 0.05);
+            border-color: rgba(124, 58, 237, 0.15);
+        }
+
+        .practice-box.w3 {
+            background: rgba(251, 191, 36, 0.05);
+            border-color: rgba(251, 191, 36, 0.15);
+        }
+
+        .pb-label {
+            font-size: 10px;
+            color: var(--green);
+            margin-bottom: 6px;
+        }
+
+        .pb-label.w2 {
+            color: #a78bfa;
+        }
+
+        .pb-label.w3 {
+            color: var(--yellow);
+        }
+
+        .pb-text {
+            font-size: 13px;
+            color: #b8b8d0;
+            line-height: 1.6;
+        }
+
+        .ai-tip {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: rgba(124, 58, 237, 0.05);
+            border: 1px solid rgba(124, 58, 237, 0.15);
+            font-size: 12px;
+            color: #a0a0c0;
+        }
+
+        .ai-tip strong {
+            color: #a78bfa;
+        }
+
+        /* REST DAY */
+        .rest-banner {
+            background: rgba(107, 107, 138, 0.08);
+            border: 1px solid rgba(107, 107, 138, 0.2);
+            border-radius: 8px;
+            padding: 14px;
+            margin-top: 14px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        /* PROGRESS OVERVIEW */
+        .progress-section {
+            margin-top: 28px;
+        }
+
+        .prog-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        .prog-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .prog-label {
+            font-size: 11px;
+            color: var(--muted);
+            width: 120px;
+            flex-shrink: 0;
+        }
+
+        .prog-bar {
+            flex: 1;
+            min-width: 160px;
+            height: 8px;
+            background: var(--surface);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .prog-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .prog-pct {
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            color: var(--muted);
+            width: 30px;
+            text-align: right;
+        }
+
+        /* TIPS */
+        .tip-section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 24px;
+        }
+
+        .tip-section h3 {
+            color: var(--yellow);
+            font-size: 15px;
+            margin-bottom: 14px;
+        }
+
+        .tip-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: #b0b0c8;
+            line-height: 1.6;
+        }
+
+        .tip-row strong {
+            color: var(--text);
+        }
+
+        /* CHECKPOINT */
+        .checkpoint {
+            background: var(--card);
+            border: 1px solid rgba(0, 245, 160, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 16px;
+        }
+
+        .checkpoint h3 {
+            color: var(--green);
+            font-size: 14px;
+            font-family: 'Space Mono', monospace;
+            margin-bottom: 12px;
+        }
+
+        .check-item {
+            display: flex;
+            gap: 10px;
+            font-size: 13px;
+            color: #b0b0c8;
+            margin-bottom: 8px;
+            align-items: flex-start;
+        }
+
+        .check-icon {
+            color: var(--green);
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        @media(max-width:480px) {
+            .day-time {
+                display: none;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="header">
+            <div
+                style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:2px;">
+                PYTHON FOUNDATION • 21 DAYS</div>
+            <h1>Python <span>Command Strong</span> Karo</h1>
+            <p>Raat 6pm–9pm daily | 3 weeks | Zero gaps ke saath</p>
+        </div>
+
+        <!-- WEEK TABS -->
+        <div class="week-tabs">
+            <button class="wtab active" onclick="showWeek(1,this)">Week 1 — Basics Solid</button>
+            <button class="wtab w2" onclick="showWeek(2,this)">Week 2 — Power Features</button>
+            <button class="wtab w3" onclick="showWeek(3,this)">Week 3 — Projects + Mastery</button>
+        </div>
+
+        <!-- ═══════════ WEEK 1 ═══════════ -->
+        <div class="week-panel active" id="week1">
+            <div class="week-banner wb-1">
+                <div>
+                    <div class="wb-title" style="color:var(--green)">Week 1 — Basics Solid Karo</div>
+                    <div class="wb-subtitle">Variables se OOP tak — poori foundation aaj se</div>
+                </div>
+                <div class="wb-badge badge-1">Day 1–7</div>
+            </div>
+
+            <!-- DAY 1 -->
+            <div class="day-card w1" onclick="toggleDay('d1')">
+                <div class="day-header">
+                    <div class="day-num dn-1">D1</div>
+                    <div class="day-info">
+                        <div class="day-title">Variables, Data Types & Operators</div>
+                        <div class="day-topic">int, float, str, bool, list, dict, tuple, set</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d1">
+                    <div class="detail-grid">
+                        <div class="detail-box">
+                            <div class="db-label">📖 THEORY (6:00–6:50)</div>
+                            <ul class="db-items">
+                                <li>Variables kya hain — naming rules</li>
+                                <li>int, float, str, bool — differences</li>
+                                <li>list vs tuple vs set vs dict</li>
+                                <li>Type conversion — int("5"), str(10)</li>
+                                <li>Arithmetic & comparison operators</li>
+                            </ul>
+                        </div>
+                        <div class="detail-box">
+                            <div class="db-label">💻 CODE (7:00–8:30)</div>
+                            <ul class="db-items">
+                                <li>name = "Bhai" → apna naam store karo</li>
+                                <li>Student marks dict banao</li>
+                                <li>List operations — append, remove, slice</li>
+                                <li>Set — duplicates remove karo</li>
+                                <li>f-string use karo — clean output</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="practice-box">
+                        <div class="pb-label">🎯 AAJ KA PROJECT</div>
+                        <div class="pb-text">Ek "Student Card" banao — naam, age, marks, subjects (list mein), grade
+                            (dict mein). Sab print karo f-string se. Simple but real!</div>
+                    </div>
+                    <div class="ai-tip"><strong>AI se poochho:</strong> "Python mein list aur tuple ka real world
+                        difference kya hai — ek alag example do"</div>
+                </div>
+            </div>
+
+            <!-- DAY 2 -->
+            <div class="day-card w1" onclick="toggleDay('d2')">
+                <div class="day-header">
+                    <div class="day-num dn-1">D2</div>
+                    <div class="day-info">
+                        <div class="day-title">Control Flow — if/elif/else + Loops</div>
+                        <div class="day-topic">conditions, for loop, while loop, break, continue</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d2">
+                    <div class="detail-grid">
+                        <div class="detail-box">
+                            <div class="db-label">📖 THEORY (6:00–6:50)</div>
+                            <ul class="db-items">
+                                <li>if / elif / else — conditions likhna</li>
+                                <li>for loop — range(), list iterate</li>
+                                <li>while loop — condition based</li>
+                                <li>break — loop todna</li>
+                                <li>continue — skip karna</li>
+                                <li>Nested loops — 2D patterns</li>
+                            </ul>
+                        </div>
+                        <div class="detail-box">
+                            <div class="db-label">💻 CODE (7:00–8:30)</div>
+                            <ul class="db-items">
+                                <li>Grade calculator — marks lo, grade do</li>
+                                <li>1 se 100 tak even numbers print</li>
+                                <li>FizzBuzz — classic problem</li>
+                                <li>Multiplication table print karo</li>
+                                <li>Star pattern — * se triangle banana</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="practice-box">
+                        <div class="pb-label">🎯 AAJ KA PROJECT</div>
+                        <div class="pb-text">Number guessing game banao — computer random number soche (1-100), user
+                            guess kare, "zyada hai / kam hai" bole. Maximum 7 tries. Jeet/haar print karo.</div>
+                    </div>
+                    <div class="ai-tip"><strong>AI se poochho:</strong> "Mujhe FizzBuzz ke 3 alag solutions dikhao —
+                        alag approaches ke saath"</div>
+                </div>
+            </div>
+
+            <!-- DAY 3 -->
+            <div class="day-card w1" onclick="toggleDay('d3')">
+                <div class="day-header">
+                    <div class="day-num dn-1">D3</div>
+                    <div class="day-info">
+                        <div class="day-title">Functions — Deep Dive</div>
+                        <div class="day-topic">def, return, *args, **kwargs, lambda, scope</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d3">
+                    <div class="detail-grid">
+                        <div class="detail-box">
+                            <div class="db-label">📖 THEORY (6:00–6:50)</div>
+                            <ul class="db-items">
+                                <li>def keyword — function banana</li>
+                                <li>Parameters vs Arguments</li>
+                                <li>Default arguments — def f(x=10)</li>
+                                <li>*args — variable arguments</li>
+                                <li>**kwargs — keyword arguments</li>
+                                <li>Lambda — ek line function</li>
+                                <li>Local vs Global scope</li>
+                                <li>Recursion — function khud ko call kare</li>
+                            </ul>
+                        </div>
+                        <div class="detail-box">
+                            <div class="db-label">💻 CODE (7:00–8:30)</div>
+                            <ul class="db-items">
+                                <li>Calculator function — add, sub, mul, div</li>
+                                <li>Factorial — recursion se</li>
+                                <li>*args se average calculate karo</li>
+                                <li>Lambda — sort by 2nd element</li>
+                                <li>Higher order functions — map(), filter()</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="practice-box">
+                        <div class="pb-label">🎯 AAJ KA PROJECT</div>
+                        <div class="pb-text">Mini Calculator banao — user choose kare operation (+, -, *, /), numbers
+                            do, answer aaye. *args use karo taaki multiple numbers add ho sakein. Error handle karo
+                            (division by zero).</div>
+                    </div>
+                    <div class="ai-tip"><strong>AI se poochho:</strong> "Mujhe *args aur **kwargs ka real world use case
+                        bata — ML mein kahan use hota hai?"</div>
+                </div>
+            </div>
+
+            <!-- DAY 4 -->
+            <div class="day-card w1" onclick="toggleDay('d4')">
+                <div class="day-header">
+                    <div class="day-num dn-1">D4</div>
+                    <div class="day-info">
+                        <div class="day-title">OOP — Object Oriented Programming</div>
+                        <div class="day-topic">class, object, __init__, inheritance, encapsulation</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d4">
+                    <div class="detail-grid">
+                        <div class="detail-box">
+                            <div class="db-label">📖 THEORY (6:00–6:50)</div>
+                            <ul class="db-items">
+                                <li>Class — blueprint concept</li>
+                                <li>Object — instance banana</li>
+                                <li>__init__ — constructor</li>
+                                <li>self — object khud ko refer karta</li>
+                                <li>Instance vs Class variables</li>
+                                <li>Inheritance — parent se features lena</li>
+                                <li>__str__ — print karne pe kya dikhे</li>
+                                <li>Encapsulation — _private variables</li>
+                            </ul>
+                        </div>
+                        <div class="detail-box">
+                            <div class="db-label">💻 CODE (7:00–8:30)</div>
+                            <ul class="db-items">
+                                <li>Student class — naam, marks, grade()</li>
+                                <li>Animal → Dog, Cat — inheritance</li>
+                                <li>BankAccount class — deposit, withdraw</li>
+                                <li>__str__ method — clean print</li>
+                                <li>Multiple objects create karo</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="practice-box">
+                        <div class="pb-label">🎯 AAJ KA PROJECT</div>
+                        <div class="pb-text">Library system banao — Book class (title, author, available), Library class
+                            (books list, add_book, borrow_book, return_book). 3-4 books add karo, borrow karo, return
+                            karo.</div>
+                    </div>
+                    <div class="ai-tip"><strong>AI se poochho:</strong> "OOP ke 4 pillars (Encapsulation, Inheritance,
+                        Polymorphism, Abstraction) — ek real life analogy se samjha"</div>
+                </div>
+            </div>
+
+            <!-- DAY 5 -->
+            <div class="day-card w1" onclick="toggleDay('d5')">
+                <div class="day-header">
+                    <div class="day-num dn-1">D5</div>
+                    <div class="day-info">
+                        <div class="day-title">File Handling + Exception Handling</div>
+                        <div class="day-topic">open/read/write, try/except/finally, JSON</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d5">
+                    <div class="detail-grid">
+                        <div class="detail-box">
+                            <div class="db-label">📖 THEORY (6:00–6:50)</div>
+                            <ul class="db-items">
+                                <li>open() — read, write, append modes</li>
+                                <li>with statement — auto close</li>
+                                <li>try / except — errors pakadna</li>
+                                <li>Multiple except blocks</li>
+                                <li>finally — hamesha chalega</li>
+                                <li>Custom exceptions</li>
+                                <li>JSON — read/write — ML mein zaroori!</li>
+                            </ul>
+                        </div>
+                        <div class="detail-box">
+                            <div class="db-label">💻 CODE (7:00–8:30)</div>
+                            <ul class="db-items">
+                                <li>Text file read karo, lines count karo</li>
+                                <li>Student data file mein save karo</li>
+                                <li>Division with try/except</li>
+                                <li>JSON file mein config save karo</li>
+                                <li>File not found gracefully handle karo</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="practice-box">
+                        <div class="pb-label">🎯 AAJ KA PROJECT</div>
+                        <div class="pb-text">Simple Diary App — user text likhein, file mein save ho (date ke saath).
+                            Previous entries read ho sakein. JSON format mein save karo. Try/except se errors handle
+                            karo.</div>
+                    </div>
+                    <div class="ai-tip"><strong>AI se poochho:</strong> "Python mein JSON format ML projects mein kahan
+                        kahan use hota hai — examples do"</div>
+                </div>
+            </div>
+
+            <!-- DAY 6 -->
+            <div class="day-card w1" onclick="toggleDay('d6')">
+                <div class="day-header">
+                    <div class="day-num dn-1">D6</div>
+                    <div class="day-info">
+                        <div class="day-title">Modules, Packages & Important Libraries</div>
+                        <div class="day-topic">import, os, sys, math, random, datetime, collections</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d6">
+                    <div class="detail-grid">
+                        <div class="detail-box">
+                            <div class="db-label">📖 THEORY (6:00–6:50)</div>
+                            <ul class="db-items">
+                                <li>import, from...import, as</li>
+                                <li>Apna module banana</li>
+                                <li>os — file system operations</li>
+                                <li>math — sqrt, ceil, floor, pi</li>
+                                <li>random — choice, randint, shuffle</li>
+                                <li>datetime — aaj ki date, time diff</li>
+                                <li>collections — Counter, defaultdict</li>
+                            </ul>
+                        </div>
+                        <div class="detail-box">
+                            <div class="db-label">💻 CODE (7:00–8:30)</div>
+                            <ul class="db-items">
+                                <li>os.path se file check karo</li>
+                                <li>random se quiz question chooser</li>
+                                <li>Counter se word frequency count</li>
+                                <li>datetime se age calculator</li>
+                                <li>Apna utility.py module banao</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="practice-box">
+                        <div class="pb-label">🎯 AAJ KA PROJECT</div>
+                        <div class="pb-text">Word Frequency Counter — ek text file lo (ya apna paragraph likho), Counter
+                            se top 10 most common words nikalo, datetime se "analyzed on: date" add karo, result file
+                            mein save karo.</div>
+                    </div>
+                    <div class="ai-tip"><strong>AI se poochho:</strong> "collections.Counter ML mein NLP preprocessing
+                        mein kaise use hota hai?"</div>
+                </div>
+            </div>
+
+            <!-- DAY 7 — REVISION -->
+            <div class="day-card w1" onclick="toggleDay('d7')">
+                <div class="day-header">
+                    <div class="day-num dn-rest">D7</div>
+                    <div class="day-info">
+                        <div class="day-title">Week 1 Revision + Mini Project</div>
+                        <div class="day-topic">Sab topics revise + ek real project banana</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d7">
+                    <div class="practice-box">
+                        <div class="pb-label">🏆 WEEK 1 FINAL PROJECT — "Student Management System"</div>
+                        <div class="pb-text">
+                            Ye sab use karo ek saath:<br><br>
+                            • Student class (OOP) — naam, marks, grade()<br>
+                            • Students ko JSON file mein save karo (File handling)<br>
+                            • New student add, view all, search by name (Functions)<br>
+                            • Try/except se errors handle karo<br>
+                            • Menu driven — loop se chalao<br><br>
+                            Ye project complete hoga to Week 1 ka confidence solid hoga!
+                        </div>
+                    </div>
+                    <div class="rest-banner">
+                        Pehle khud banao — 2 ghante try karo. Phir AI se sirf specific doubts poochho. Answer mat
+                        maango!
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkpoint">
+                <h3>✅ WEEK 1 END — YE AANA CHAHIYE</h3>
+                <div class="check-item"><span class="check-icon">✓</span><span>Variables, all data types confidently use
+                        kar sako</span></div>
+                <div class="check-item"><span class="check-icon">✓</span><span>Loops aur conditions bina soche likh
+                        sako</span></div>
+                <div class="check-item"><span class="check-icon">✓</span><span>Functions — *args, **kwargs, lambda
+                        samajh aaye</span></div>
+                <div class="check-item"><span class="check-icon">✓</span><span>Ek simple OOP project bana sako</span>
+                </div>
+                <div class="check-item"><span class="check-icon">✓</span><span>File read/write + JSON handle kar
+                        sako</span></div>
+            </div>
+        </div>
+
+        <!-- ═══════════ WEEK 2 ═══════════ -->
+        <div class="week-panel" id="week2">
+            <div class="week-banner wb-2">
+                <div>
+                    <div class="wb-title" style="color:#a78bfa">Week 2 — Power Features</div>
+                    <div class="wb-subtitle">Advanced Python — ML mein har jagah ye features use honge</div>
+                </div>
+                <div class="wb-badge badge-2">Day 8–14</div>
+            </div>
+
+            <!-- DAY 8 -->
+            <div class="day-card w2" onclick="toggleDay('d8')">
+                <div class="day-header">
+                    <div class="day-num dn-2">D8</div>
+                    <div class="day-info">
+                        <div class="day-title">List Comprehensions + Generators</div>
+                        <div class="day-topic">[ ] comprehension, dict comprehension, yield, generator</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d8">
+                    <div class="detail-grid">
+                        <div class="detail-box">
+                            <div class="db-label">📖 THEORY (6:00–6:50)</div>
+                            <ul class="db-items purple">
+                                <li>List comprehension — [x*2 for x in range(10)]</li>
+                                <li>Conditional comprehension — [x for x if x%2==0]</li>
+                                <li>Dict comprehension — {k:v for k,v}</li>
+                                <li>Set comprehension</li>
+                                <li>Generator — yield keyword</li>
+                                <li>Generator vs List — memory difference</li>
+                            </ul>
+                        </div>
+                        <div class="detail-box">
+                            <div class="db-label">💻 CODE (7:00–8:30)</div>
+                            <ul class="db-items purple">
+                                <li>Squares list — comprehension se</li>
+                                <li>Even numbers filter karo</li>
+                                <li>Word lengths dict banana</li>
+                                <li>Flatten 2D list — nested comprehension</li>
+                                <li>Infinite counter — generator se</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="practice-box w2">
+                        <div class="pb-label w2">🎯 AAJ KA PROJECT</div>
+                        <div class="pb-text">Data cleaning pipeline — ek list of strings lo (names with spaces,
+                            uppercase), comprehension se: strip karo, lowercase karo, 3 char se chhote remove karo. Ek
+                            line mein karo!</div>
+                    </div>
+                    <div class="ai-tip"><strong>AI se poochho:</strong> "ML data preprocessing mein list comprehension
+                        ka ek real example dikhao"</div>
+                </div>
+            </div>
+
+            <!-- DAY 9 -->
+            <div class="day-card w2" onclick="toggleDay('d9')">
+                <div class="day-header">
+                    <div class="day-num dn-2">D9</div>
+                    <div class="day-info">
+                        <div class="day-title">Decorators + Context Managers</div>
+                        <div class="day-topic">@decorator, functools.wraps, with statement, __enter__/__exit__</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d9">
+                    <div class="detail-grid">
+                        <div class="detail-box">
+                            <div class="db-label">📖 THEORY (6:00–6:50)</div>
+                            <ul class="db-items purple">
+                                <li>First class functions — functions as arguments</li>
+                                <li>Closure — function inside function</li>
+                                <li>Decorator — @syntax</li>
+                                <li>functools.wraps — docstring preserve</li>
+                                <li>Context manager — with statement</li>
+                                <li>Custom context manager</li>
+                            </ul>
+                        </div>
+                        <div class="detail-box">
+                            <div class="db-label">💻 CODE (7:00–8:30)</div>
+                            <ul class="db-items purple">
+                                <li>Timer decorator — function ka time measure</li>
+                                <li>Logger decorator — function calls log karo</li>
+                                <li>@staticmethod, @classmethod</li>
+                                <li>Custom file context manager</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="practice-box w2">
+                        <div class="pb-label w2">🎯 AAJ KA PROJECT</div>
+                        <div class="pb-text">ML mein bahut use hota hai — @timer decorator banao jo ML training
+                            functions ka time measure kare. @validate_input banao jo check kare ki input list empty nahi
+                            hai. Real ML code jaisa!</div>
+                    </div>
+                    <div class="ai-tip"><strong>AI se poochho:</strong> "PyTorch mein decorators kahan use hote hain —
+                        examples do"</div>
+                </div>
+            </div>
+
+            <!-- DAY 10 -->
+            <div class="day-card w2" onclick="toggleDay('d10')">
+                <div class="day-header">
+                    <div class="day-num dn-2">D10</div>
+                    <div class="day-info">
+                        <div class="day-title">Advanced OOP — Dunder Methods + Inheritance</div>
+                        <div class="day-topic">__repr__, __len__, __add__, MRO, super(), ABC</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d10">
+                    <div class="detail-grid">
+                        <div class="detail-box">
+                            <div class="db-label">📖 THEORY (6:00–6:50)</div>
+                            <ul class="db-items purple">
+                                <li>Dunder/Magic methods — __repr__, __len__</li>
+                                <li>__add__, __eq__, __lt__ — operators override</li>
+                                <li>Multiple inheritance + MRO</li>
+                                <li>super() — parent class call karna</li>
+                                <li>Abstract classes — ABC</li>
+                                <li>@property — getters/setters</li>
+                            </ul>
+                        </div>
+                        <div class="detail-box">
+                            <div class="db-label">💻 CODE (7:00–8:30)</div>
+                            <ul class="db-items purple">
+                                <li>Vector class — __add__, __mul__, __len__</li>
+                                <li>Matrix class — basic operations</li>
+                                <li>Abstract Shape — area() implement karo</li>
+                                <li>@property se temperature converter</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="practice-box w2">
+                        <div class="pb-label w2">🎯 AAJ KA PROJECT</div>
+                        <div class="pb-text">Vector class banao jaise NumPy arrays — __add__, __sub__, __mul__ (dot
+                            product), __len__, __repr__. Do vectors add, subtract, dot product karo. Ye exactly NumPy ke
+                            andar ka logic hai!</div>
+                    </div>
+                    <div class="ai-tip"><strong>AI se poochho:</strong> "PyTorch mein nn.Module ka __call__ method
+                        internally kaise kaam karta hai?"</div>
+                </div>
+            </div>
+
+            <!-- DAY 11 -->
+            <div class="day-card w2" onclick="toggleDay('d11')">
+                <div class="day-header">
+                    <div class="day-num dn-2">D11</div>
+                    <div class="day-info">
+                        <div class="day-title">Iterators, Zip, Enumerate + Functional Programming</div>
+                        <div class="day-topic">iter/next, zip, enumerate, map, filter, reduce, sorted</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d11">
+                    <div class="detail-grid">
+                        <div class="detail-box">
+                            <div class="db-label">📖 THEORY (6:00–6:50)</div>
+                            <ul class="db-items purple">
+                                <li>Iterator protocol — __iter__, __next__</li>
+                                <li>zip() — multiple lists ek saath</li>
+                                <li>enumerate() — index + value</li>
+                                <li>map() — function apply on list</li>
+                                <li>filter() — condition se filter</li>
+                                <li>reduce() — accumulate karna</li>
+                                <li>sorted() with key — custom sort</li>
+                            </ul>
+                        </div>
+                        <div class="detail-box">
+                            <div class="db-label">💻 CODE (7:00–8:30)</div>
+                            <ul class="db-items purple">
+                                <li>zip se two lists merge karo</li>
+                                <li>enumerate se indexed printing</li>
+                                <li>map se batch data transform</li>
+                                <li>filter se valid emails nikalo</li>
+                                <li>sorted — students ko marks se sort</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="practice-box w2">
+                        <div class="pb-label w2">🎯 AAJ KA PROJECT</div>
+                        <div class="pb-text">Data preprocessing pipeline — names list aur scores list lo, zip karo,
+                            enumerate se index add karo, map se normalize karo (0-100 to 0-1), filter se 0.5+ wale
+                            nikalo. Ye ML preprocessing jaisa hi hai!</div>
+                    </div>
+                    <div class="ai-tip"><strong>AI se poochho:</strong> "ML data loading loop mein enumerate() aur zip()
+                        ka use kaise hota hai — PyTorch example do"</div>
+                </div>
+            </div>
+
+            <!-- DAY 12 -->
+            <div class="day-card w2" onclick="toggleDay('d12')">
+                <div class="day-header">
+                    <div class="day-num dn-2">D12</div>
+                    <div class="day-info">
+                        <div class="day-title">Type Hints + Virtual Environments + pip</div>
+                        <div class="day-topic">typing, annotations, venv, requirements.txt, pip</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d12">
+                    <div class="detail-grid">
+                        <div class="detail-box">
+                            <div class="db-label">📖 THEORY (6:00–6:50)</div>
+                            <ul class="db-items purple">
+                                <li>Type hints — def add(x: int, y: int) -> int</li>
+                                <li>List[int], Dict[str, float], Optional</li>
+                                <li>Virtual environment — venv</li>
+                                <li>pip install — packages install</li>
+                                <li>requirements.txt — project dependencies</li>
+                                <li>VS Code setup — Python extension, linter</li>
+                            </ul>
+                        </div>
+                        <div class="detail-box">
+                            <div class="db-label">💻 CODE (7:00–8:30)</div>
+                            <ul class="db-items purple">
+                                <li>ML-style functions type hints ke saath</li>
+                                <li>venv banao — activate karo</li>
+                                <li>numpy install karo venv mein</li>
+                                <li>requirements.txt generate karo</li>
+                                <li>VS Code properly configure karo</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="practice-box w2">
+                        <div class="pb-label w2">🎯 AAJ KA PROJECT</div>
+                        <div class="pb-text">Professional ML project structure banao — /src/utils.py (helper functions
+                            with type hints), /data/ folder, requirements.txt, .gitignore, README.md. Ye real ML project
+                            structure hai!</div>
+                    </div>
+                    <div class="ai-tip"><strong>AI se poochho:</strong> "Professional ML project ka folder structure kya
+                        hona chahiye — dikhao"</div>
+                </div>
+            </div>
+
+            <!-- DAY 13 -->
+            <div class="day-card w2" onclick="toggleDay('d13')">
+                <div class="day-header">
+                    <div class="day-num dn-2">D13</div>
+                    <div class="day-info">
+                        <div class="day-title">String Manipulation + Regex Basics</div>
+                        <div class="day-topic">string methods, re module — NLP preprocessing ke liye</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d13">
+                    <div class="detail-grid">
+                        <div class="detail-box">
+                            <div class="db-label">📖 THEORY (6:00–6:50)</div>
+                            <ul class="db-items purple">
+                                <li>String methods — split, join, strip, replace</li>
+                                <li>upper, lower, title, capitalize</li>
+                                <li>find, index, count, startswith, endswith</li>
+                                <li>format() vs f-strings</li>
+                                <li>Regex — re.match, re.search, re.findall</li>
+                                <li>Common patterns — email, phone, URL</li>
+                            </ul>
+                        </div>
+                        <div class="detail-box">
+                            <div class="db-label">💻 CODE (7:00–8:30)</div>
+                            <ul class="db-items purple">
+                                <li>Email validator — regex se</li>
+                                <li>Text clean karo — punctuation remove</li>
+                                <li>CSV line parser — split se</li>
+                                <li>URL se domain extract karo</li>
+                                <li>Sentence tokenizer banana</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="practice-box w2">
+                        <div class="pb-label w2">🎯 AAJ KA PROJECT</div>
+                        <div class="pb-text">Simple NLP Preprocessor banao — ek paragraph lo, lowercase karo,
+                            punctuation remove karo (regex), words split karo, stop words remove karo, word frequency
+                            count karo. Ye actual NLP pipeline ka base hai!</div>
+                    </div>
+                    <div class="ai-tip"><strong>AI se poochho:</strong> "NLP preprocessing mein regex ke 5 most common
+                        use cases kya hain?"</div>
+                </div>
+            </div>
+
+            <!-- DAY 14 -->
+            <div class="day-card w2" onclick="toggleDay('d14')">
+                <div class="day-header">
+                    <div class="day-num dn-rest">D14</div>
+                    <div class="day-info">
+                        <div class="day-title">Week 2 Revision + Project</div>
+                        <div class="day-topic">Advanced features sab ek project mein use karo</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d14">
+                    <div class="practice-box w2">
+                        <div class="pb-label w2">🏆 WEEK 2 FINAL PROJECT — "Mini Data Pipeline"</div>
+                        <div class="pb-text">
+                            Sab advanced features use karo:<br><br>
+                            • CSV file read karo (file handling)<br>
+                            • List comprehensions se clean karo<br>
+                            • Type hints wali functions<br>
+                            • @timer decorator — kitna time laga<br>
+                            • Regex se invalid emails filter karo<br>
+                            • zip + enumerate se process karo<br>
+                            • JSON mein save karo<br><br>
+                            Ye ek real data pipeline hai — ML projects mein yahi hoga!
+                        </div>
+                    </div>
+                    <div class="checkpoint" style="margin-top:16px;">
+                        <h3>✅ WEEK 2 END — YE AANA CHAHIYE</h3>
+                        <div class="check-item"><span class="check-icon">✓</span><span>List/Dict comprehension ek line
+                                mein likh sako</span></div>
+                        <div class="check-item"><span class="check-icon">✓</span><span>Decorator banana aur use karna
+                                aaye</span></div>
+                        <div class="check-item"><span class="check-icon">✓</span><span>Advanced OOP — dunder methods
+                                samajh aaye</span></div>
+                        <div class="check-item"><span class="check-icon">✓</span><span>venv + pip + project structure
+                                pata ho</span></div>
+                        <div class="check-item"><span class="check-icon">✓</span><span>Basic regex se text process kar
+                                sako</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════ WEEK 3 ═══════════ -->
+        <div class="week-panel" id="week3">
+            <div class="week-banner wb-3">
+                <div>
+                    <div class="wb-title" style="color:var(--yellow)">Week 3 — NumPy Bridge + Python Mastery</div>
+                    <div class="wb-subtitle">Python → NumPy transition + final projects + GitHub</div>
+                </div>
+                <div class="wb-badge badge-3">Day 15–21</div>
+            </div>
+
+            <!-- DAY 15 -->
+            <div class="day-card w3" onclick="toggleDay('d15')">
+                <div class="day-header">
+                    <div class="day-num dn-3">D15</div>
+                    <div class="day-info">
+                        <div class="day-title">NumPy Introduction — Python se Bridge</div>
+                        <div class="day-topic">np.array, shape, dtype, basic operations — Phase 1 ka preview</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d15">
+                    <div class="detail-grid">
+                        <div class="detail-box">
+                            <div class="db-label">📖 THEORY (6:00–6:50)</div>
+                            <ul class="db-items yellow">
+                                <li>NumPy kya hai — Python lists se kyun better</li>
+                                <li>np.array() — banana</li>
+                                <li>Shape, ndim, dtype, size</li>
+                                <li>1D, 2D, 3D arrays</li>
+                                <li>Indexing aur slicing</li>
+                                <li>Basic math — add, multiply, mean</li>
+                            </ul>
+                        </div>
+                        <div class="detail-box">
+                            <div class="db-label">💻 CODE (7:00–8:30)</div>
+                            <ul class="db-items yellow">
+                                <li>Marks array banao — mean, max, min</li>
+                                <li>2D matrix — rows aur columns access</li>
+                                <li>Python list vs NumPy — speed compare</li>
+                                <li>Boolean indexing — 70+ marks filter</li>
+                                <li>Matrix addition, multiplication</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="practice-box w3">
+                        <div class="pb-label w3">🎯 AAJ KA PROJECT</div>
+                        <div class="pb-text">Student marks NumPy array mein store karo (5 students × 5 subjects). Each
+                            student ka average nikalo. Class ka overall average. Pass/fail (numpy boolean indexing se).
+                            Ye Week 4 ke liye warmup hai!</div>
+                    </div>
+                    <div class="ai-tip"><strong>AI se poochho:</strong> "NumPy array internally Python list se kaise
+                        alag store hota hai memory mein?"</div>
+                </div>
+            </div>
+
+            <!-- DAY 16 -->
+            <div class="day-card w3" onclick="toggleDay('d16')">
+                <div class="day-header">
+                    <div class="day-num dn-3">D16</div>
+                    <div class="day-info">
+                        <div class="day-title">Git + GitHub — Portfolio Banana Shuru Karo</div>
+                        <div class="day-topic">git init, add, commit, push, GitHub profile</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d16">
+                    <div class="detail-grid">
+                        <div class="detail-box">
+                            <div class="db-label">📖 THEORY (6:00–6:50)</div>
+                            <ul class="db-items yellow">
+                                <li>Git kya hai — version control</li>
+                                <li>git init, git add, git commit</li>
+                                <li>git push — GitHub pe upload</li>
+                                <li>README.md — project describe karo</li>
+                                <li>.gitignore — kya ignore karna hai</li>
+                                <li>Branches — basic concept</li>
+                            </ul>
+                        </div>
+                        <div class="detail-box">
+                            <div class="db-label">💻 HANDS-ON (7:00–8:30)</div>
+                            <ul class="db-items yellow">
+                                <li>GitHub account banao (nahi hai to)</li>
+                                <li>python-practice repo banao</li>
+                                <li>Week 1+2 projects upload karo</li>
+                                <li>Accha README.md likho</li>
+                                <li>Profile README banao — apna intro</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="practice-box w3">
+                        <div class="pb-label w3">🎯 AAJ KA PROJECT</div>
+                        <div class="pb-text">GitHub profile ready karo — "python-21-days" repo banao, sab projects
+                            organized folders mein daalo, README mein likho "BCA student | Learning DL | Python
+                            Projects". Aaj se roz commit karo!</div>
+                    </div>
+                    <div class="ai-tip"><strong>AI se poochho:</strong> "ML engineer ke GitHub profile mein kya kya hona
+                        chahiye — examples do"</div>
+                </div>
+            </div>
+
+            <!-- DAY 17-19 -->
+            <div class="day-card w3" onclick="toggleDay('d17')">
+                <div class="day-header">
+                    <div class="day-num dn-3">D17</div>
+                    <div class="day-info">
+                        <div class="day-title">Python + OOP Practice Problems</div>
+                        <div class="day-topic">HackerRank / LeetCode easy problems — speed aur confidence</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d17">
+                    <div class="practice-box w3">
+                        <div class="pb-label w3">🎯 AAJ KA FOCUS — Speed Coding</div>
+                        <div class="pb-text">
+                            HackerRank "30 Days of Code" se Day 0–10 solve karo. Timer lagao — har problem mein max 20
+                            min. Nahi hua to chota hint lo, phir khud likho.<br><br>
+                            Minimum 5 problems solve karo aaj. GitHub pe push karo.
+                        </div>
+                    </div>
+                    <div class="ai-tip"><strong>AI se poochho:</strong> "Ye problem solve nahi ho rahi — hint do sirf
+                        approach ka, solution nahi" — ye sahi tarika hai!</div>
+                </div>
+            </div>
+
+            <div class="day-card w3" onclick="toggleDay('d18')">
+                <div class="day-header">
+                    <div class="day-num dn-3">D18</div>
+                    <div class="day-info">
+                        <div class="day-title">Debugging + Code Reading Practice</div>
+                        <div class="day-topic">pdb, print debugging, dusron ka code padhna</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d18">
+                    <div class="practice-box w3">
+                        <div class="pb-label w3">🎯 AAJ KA FOCUS — Debug Karna Seekho</div>
+                        <div class="pb-text">
+                            Bahut important skill hai ye — ML mein errors aate hi rehte hain.<br><br>
+                            • VS Code debugger use karo — breakpoints lagao<br>
+                            • print() debugging — kahan value kya hai<br>
+                            • GitHub pe kisi ka beginner Python project dekho — code read karo<br>
+                            • Apne purane code mein intentional bugs daalo — phir fix karo<br><br>
+                            Debugging = real engineer ki pehchan!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="day-card w3" onclick="toggleDay('d19')">
+                <div class="day-header">
+                    <div class="day-num dn-3">D19</div>
+                    <div class="day-info">
+                        <div class="day-title">Revision — Weakest Topics Strong Karo</div>
+                        <div class="day-topic">Jo topic abhi bhi shaky lag raha hai — aaj wo karo</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d19">
+                    <div class="practice-box w3">
+                        <div class="pb-label w3">🎯 PERSONAL REVISION DAY</div>
+                        <div class="pb-text">
+                            Khud se honestly poochho — kaunsa topic abhi bhi confident nahi lagta?<br><br>
+                            Common weak spots: Decorators, Generators, Advanced OOP<br><br>
+                            Usi topic pe aaj poora 3 ghante do. Ek aur project banao usi topic pe. GitHub pe push karo.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DAY 20-21 FINAL -->
+            <div class="day-card w3" onclick="toggleDay('d20')">
+                <div class="day-header">
+                    <div class="day-num dn-3">D20</div>
+                    <div class="day-info">
+                        <div class="day-title">Final Project — Day 1</div>
+                        <div class="day-topic">Bada project shuru karo — sab kuch use hoga</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d20">
+                    <div class="practice-box w3">
+                        <div class="pb-label w3">🏆 21-DAY FINAL PROJECT — "Mini ML Toolkit"</div>
+                        <div class="pb-text">
+                            Ek pure Python ML toolkit banao (NumPy nahi, sirf Python):<br><br>
+                            • Dataset class — CSV load, clean, split (train/test)<br>
+                            • Stats module — mean, variance, normalize (type hints)<br>
+                            • Visualizer — ASCII bar chart terminal mein<br>
+                            • @timer, @logger decorators throughout<br>
+                            • JSON mein results save karo<br>
+                            • Comprehensive README + GitHub<br><br>
+                            Day 20 mein structure + 50% code. Day 21 mein complete + polish.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="day-card w3" onclick="toggleDay('d21')">
+                <div class="day-header">
+                    <div class="day-num dn-rest">D21</div>
+                    <div class="day-info">
+                        <div class="day-title">Final Project Complete + Celebrate! 🎉</div>
+                        <div class="day-topic">Project finish, GitHub push, agle phase ke liye ready</div>
+                    </div>
+                    <div class="day-time">6–9pm • 3hr</div>
+                </div>
+                <div class="day-detail" id="d21">
+                    <div class="practice-box w3">
+                        <div class="pb-label w3">🎯 DAY 21 — FINISH + CELEBRATE</div>
+                        <div class="pb-text">
+                            Project complete karo. GitHub pe push karo. README update karo.<br><br>
+                            Phir genuinely celebrate karo — 21 days complete kiye! 🎉<br><br>
+                            Agle din se Phase 1 start — NumPy properly seekhna. But aaj — rest!
+                        </div>
+                    </div>
+                    <div class="checkpoint" style="margin-top:16px;">
+                        <h3>🏆 21 DAYS DONE — TU READY HAI</h3>
+                        <div class="check-item"><span class="check-icon">✓</span><span>Python confidently likh sakta hai
+                                bina Google ke</span></div>
+                        <div class="check-item"><span class="check-icon">✓</span><span>OOP, decorators, comprehensions —
+                                sab solid</span></div>
+                        <div class="check-item"><span class="check-icon">✓</span><span>GitHub pe projects hain —
+                                portfolio shuru ho gaya</span></div>
+                        <div class="check-item"><span class="check-icon">✓</span><span>NumPy ka introduction ho
+                                gaya</span></div>
+                        <div class="check-item"><span class="check-icon">✓</span><span>Agle step — NumPy + Pandas
+                                properly seekhna ✅</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROGRESS OVERVIEW -->
+        <div class="progress-section"
+            style="margin-top:28px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px;">
+            <div class="prog-title">📊 Python Topics Coverage</div>
+            <div class="prog-row">
+                <div class="prog-label">Basics/Types</div>
+                <div class="prog-bar">
+                    <div class="prog-fill" style="width:100%; background:var(--green);"></div>
+                </div>
+                <div class="prog-pct">Day 1</div>
+            </div>
+            <div class="prog-row">
+                <div class="prog-label">Control Flow</div>
+                <div class="prog-bar">
+                    <div class="prog-fill" style="width:100%; background:var(--green);"></div>
+                </div>
+                <div class="prog-pct">Day 2</div>
+            </div>
+            <div class="prog-row">
+                <div class="prog-label">Functions</div>
+                <div class="prog-bar">
+                    <div class="prog-fill" style="width:100%; background:var(--green);"></div>
+                </div>
+                <div class="prog-pct">Day 3</div>
+            </div>
+            <div class="prog-row">
+                <div class="prog-label">OOP</div>
+                <div class="prog-bar">
+                    <div class="prog-fill" style="width:100%; background:var(--green);"></div>
+                </div>
+                <div class="prog-pct">Day 4+10</div>
+            </div>
+            <div class="prog-row">
+                <div class="prog-label">File/Exceptions</div>
+                <div class="prog-bar">
+                    <div class="prog-fill" style="width:100%; background:var(--green);"></div>
+                </div>
+                <div class="prog-pct">Day 5</div>
+            </div>
+            <div class="prog-row">
+                <div class="prog-label">Advanced Python</div>
+                <div class="prog-bar">
+                    <div class="prog-fill" style="width:100%; background:#a78bfa;"></div>
+                </div>
+                <div class="prog-pct">Day 8-13</div>
+            </div>
+            <div class="prog-row">
+                <div class="prog-label">NumPy Bridge</div>
+                <div class="prog-bar">
+                    <div class="prog-fill" style="width:100%; background:var(--yellow);"></div>
+                </div>
+                <div class="prog-pct">Day 15</div>
+            </div>
+            <div class="prog-row">
+                <div class="prog-label">Git/GitHub</div>
+                <div class="prog-bar">
+                    <div class="prog-fill" style="width:100%; background:var(--yellow);"></div>
+                </div>
+                <div class="prog-pct">Day 16</div>
+            </div>
+        </div>
+
+        <!-- TIPS -->
+        <div class="tip-section">
+            <h3>💡 21 Days Successfully Complete Karne Ke Tips</h3>
+            <div class="tip-row"><span>⏰</span>
+                <div><strong>6pm ko alarm lagao.</strong> Roz same time. Brain habit ban jaati hai automatically focus
+                    karne ki.</div>
+            </div>
+            <div class="tip-row"><span>📵</span>
+                <div><strong>Phone doosre room mein.</strong> 3 ghante ke liye — notifications off. Instagram baad mein
+                    hoga, ye 21 din nahi.</div>
+            </div>
+            <div class="tip-row"><span>✍️</span>
+                <div><strong>Code type karo — copy-paste nahi.</strong> Fingers muscle memory banate hain. Ye slow
+                    lagega — worth it hai.</div>
+            </div>
+            <div class="tip-row"><span>📓</span>
+                <div><strong>Har din 3 lines diary mein.</strong> "Aaj seekha: X. Struggle: Y. Kal karunga: Z." 2 minute
+                    — bahut powerful.</div>
+            </div>
+            <div class="tip-row"><span>🔄</span>
+                <div><strong>Miss hua — 1 din okay, 2 din allowed nahi.</strong> Streak todo — wapas aao. Guilt nahi,
+                    action karo.</div>
+            </div>
+        </div>
+
+        <div
+            style="text-align:center; padding:40px 0 20px; color:var(--muted); font-family:'Space Mono',monospace; font-size:12px;">
+            Day 1 shuru karo kal se • 21 days • Python master • NumPy ready 🚀
+        </div>
+
+    </div>
+    <script>
+        function showWeek( w, btn ) {
+            document.querySelectorAll( '.week-panel' ).forEach( p => p.classList.remove( 'active' ) );
+            document.querySelectorAll( '.wtab' ).forEach( b => b.classList.remove( 'active' ) );
+            document.getElementById( 'week' + w ).classList.add( 'active' );
+            btn.classList.add( 'active' );
+        }
+        function toggleDay( id ) {
+            const el = document.getElementById( id );
+            el.classList.toggle( 'open' );
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mera Daily Timetable</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
+
+        :root {
+            --bg: #0d0d14;
+            --surface: #14141f;
+            --card: #1c1c2a;
+            --border: #2a2a40;
+            --green: #00f5a0;
+            --purple: #7c3aed;
+            --yellow: #fbbf24;
+            --red: #ef4444;
+            --blue: #3b82f6;
+            --orange: #f97316;
+            --pink: #ec4899;
+            --text: #e8e8f0;
+            --muted: #6b6b8a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Syne', sans-serif;
+            min-height: 100vh;
+            padding: 24px 16px 60px;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        .header {
+            text-align: center;
+            padding: 32px 0 40px;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background: var(--green);
+            margin: 16px auto 0;
+            border-radius: 2px;
+        }
+
+        .header h1 {
+            font-size: clamp(28px, 6vw, 48px);
+            font-weight: 800;
+        }
+
+        .header h1 span {
+            color: var(--green);
+        }
+
+        .header p {
+            color: var(--muted);
+            font-size: 14px;
+            margin-top: 8px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* STATS ROW */
+        .stats {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+            justify-content: center;
+        }
+
+        .stat {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            text-align: center;
+            flex: 1;
+            min-width: 120px;
+            max-width: 160px;
+        }
+
+        .stat-num {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--muted);
+            font-family: 'Space Mono', monospace;
+            margin-top: 4px;
+        }
+
+        /* DAY TOGGLE */
+        .day-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            justify-content: center;
+        }
+
+        .day-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--muted);
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .day-btn:hover {
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .day-btn.active {
+            background: rgba(0, 245, 160, 0.12);
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .day-btn.weekend.active {
+            background: rgba(251, 191, 36, 0.12);
+            border-color: var(--yellow);
+            color: var(--yellow);
+        }
+
+        /* SCHEDULE */
+        .schedule {
+            display: none;
+        }
+
+        .schedule.active {
+            display: block;
+            animation: fadeUp 0.3s ease;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* TIME BLOCK */
+        .time-block {
+            display: flex;
+            gap: 0;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .time-block:hover {
+            transform: translateX(4px);
+        }
+
+        .time-col {
+            background: var(--surface);
+            padding: 14px 16px;
+            min-width: 110px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-right: 1px solid var(--border);
+        }
+
+        .time-text {
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .duration {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 3px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .content-col {
+            flex: 1;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .emoji {
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .block-info {
+            flex: 1;
+        }
+
+        .block-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .block-desc {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .block-tag {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-family: 'Space Mono', monospace;
+            border: 1px solid;
+            margin-left: auto;
+            flex-shrink: 0;
+            align-self: flex-start;
+            margin-top: 2px;
+        }
+
+        /* COLORS per category */
+        .cat-sleep {
+            background: rgba(107, 107, 138, 0.1);
+            border-color: rgba(107, 107, 138, 0.3);
+        }
+
+        .cat-sleep .block-title {
+            color: var(--muted);
+        }
+
+        .cat-sleep .time-text {
+            color: var(--muted);
+        }
+
+        .cat-morning {
+            background: rgba(251, 191, 36, 0.06);
+            border-color: rgba(251, 191, 36, 0.2);
+        }
+
+        .cat-morning:hover {
+            border-color: var(--yellow);
+        }
+
+        .cat-morning .block-title {
+            color: var(--yellow);
+        }
+
+        .cat-morning .time-text {
+            color: var(--yellow);
+        }
+
+        .cat-college {
+            background: rgba(59, 130, 246, 0.06);
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+
+        .cat-college:hover {
+            border-color: var(--blue);
+        }
+
+        .cat-college .block-title {
+            color: var(--blue);
+        }
+
+        .cat-college .time-text {
+            color: var(--blue);
+        }
+
+        .cat-bca {
+            background: rgba(124, 58, 237, 0.06);
+            border-color: rgba(124, 58, 237, 0.2);
+        }
+
+        .cat-bca:hover {
+            border-color: var(--purple);
+        }
+
+        .cat-bca .block-title {
+            color: #a78bfa;
+        }
+
+        .cat-bca .time-text {
+            color: #a78bfa;
+        }
+
+        .cat-break {
+            background: rgba(249, 115, 22, 0.06);
+            border-color: rgba(249, 115, 22, 0.2);
+        }
+
+        .cat-break .block-title {
+            color: var(--orange);
+        }
+
+        .cat-break .time-text {
+            color: var(--orange);
+        }
+
+        .cat-dl {
+            background: rgba(0, 245, 160, 0.06);
+            border-color: rgba(0, 245, 160, 0.25);
+        }
+
+        .cat-dl:hover {
+            border-color: var(--green);
+        }
+
+        .cat-dl .block-title {
+            color: var(--green);
+        }
+
+        .cat-dl .time-text {
+            color: var(--green);
+        }
+
+        .cat-project {
+            background: rgba(236, 72, 153, 0.06);
+            border-color: rgba(236, 72, 153, 0.2);
+        }
+
+        .cat-project:hover {
+            border-color: var(--pink);
+        }
+
+        .cat-project .block-title {
+            color: var(--pink);
+        }
+
+        .cat-project .time-text {
+            color: var(--pink);
+        }
+
+        .cat-review {
+            background: rgba(239, 68, 68, 0.06);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .cat-review:hover {
+            border-color: var(--red);
+        }
+
+        .cat-review .block-title {
+            color: var(--red);
+        }
+
+        .cat-review .time-text {
+            color: var(--red);
+        }
+
+        /* TAGS */
+        .tag-dl {
+            color: var(--green);
+            border-color: rgba(0, 245, 160, 0.3);
+        }
+
+        .tag-bca {
+            color: #a78bfa;
+            border-color: rgba(124, 58, 237, 0.3);
+        }
+
+        .tag-rest {
+            color: var(--orange);
+            border-color: rgba(249, 115, 22, 0.3);
+        }
+
+        .tag-review {
+            color: var(--red);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .tag-project {
+            color: var(--pink);
+            border-color: rgba(236, 72, 153, 0.3);
+        }
+
+        .tag-college {
+            color: var(--blue);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        /* DL BLOCK DETAIL */
+        .dl-detail {
+            background: var(--card);
+            border: 1px solid rgba(0, 245, 160, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0 8px;
+        }
+
+        .dl-detail h3 {
+            color: var(--green);
+            font-size: 14px;
+            margin-bottom: 12px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .dl-steps {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .dl-step {
+            flex: 1;
+            min-width: 160px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .step-time {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: var(--green);
+            margin-bottom: 6px;
+        }
+
+        .step-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .step-desc {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        /* TIPS BOX */
+        .tips-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 24px;
+        }
+
+        .tips-box h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: var(--yellow);
+        }
+
+        .tip {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: flex-start;
+        }
+
+        .tip-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .tip-text {
+            font-size: 13px;
+            color: #b0b0c8;
+            line-height: 1.6;
+        }
+
+        .tip-text strong {
+            color: var(--text);
+        }
+
+        /* WEEKLY SUMMARY */
+        .weekly {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 24px;
+        }
+
+        .weekly h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: var(--purple);
+        }
+
+        .weekly-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .w-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+        }
+
+        .w-day {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .w-focus {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--green);
+        }
+
+        .w-desc {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* AI USAGE */
+        .ai-box {
+            background: var(--card);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 24px;
+        }
+
+        .ai-box h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: #a78bfa;
+        }
+
+        .ai-do {
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        .ai-dont {
+            color: var(--red);
+            font-weight: 700;
+        }
+
+        .ai-row {
+            font-size: 13px;
+            color: #b0b0c8;
+            margin-bottom: 8px;
+            display: flex;
+            gap: 8px;
+        }
+
+        /* PHASE PROGRESS */
+        .phase-now {
+            background: rgba(0, 245, 160, 0.05);
+            border: 1px solid rgba(0, 245, 160, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 24px;
+        }
+
+        .phase-now h3 {
+            font-size: 14px;
+            font-family: 'Space Mono', monospace;
+            color: var(--green);
+            margin-bottom: 12px;
+        }
+
+        .phase-bar {
+            background: var(--surface);
+            border-radius: 8px;
+            height: 8px;
+            margin: 8px 0 16px;
+            overflow: hidden;
+        }
+
+        .phase-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--green), #00c87a);
+            border-radius: 8px;
+            width: 15%;
+            transition: width 1s ease;
+        }
+
+        @media (max-width: 500px) {
+            .time-col {
+                min-width: 85px;
+            }
+
+            .block-tag {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="header">
+            <div
+                style="font-family:'Space Mono',monospace; font-size:11px; color:var(--muted); margin-bottom:8px; letter-spacing:2px;">
+                BCA 1ST YEAR • DEEP LEARNING TRACK</div>
+            <h1>Mera <span>Daily Timetable</span></h1>
+            <p>Python Decent → Deep Learning Engineer | Raat 6pm-12am = DL Time</p>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-num" style="color:var(--blue)">3h</div>
+                <div class="stat-label">College</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num" style="color:#a78bfa">5h</div>
+                <div class="stat-label">BCA Syllabus</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num" style="color:var(--green)">2.5h</div>
+                <div class="stat-label">Deep Learning</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num" style="color:var(--pink)">1h</div>
+                <div class="stat-label">Project/Revision</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num" style="color:var(--yellow)">6h</div>
+                <div class="stat-label">Sleep</div>
+            </div>
+        </div>
+
+        <!-- DAY TABS -->
+        <div class="day-tabs">
+            <button class="day-btn active" onclick="showDay('weekday')">Mon–Fri (Weekday)</button>
+            <button class="day-btn weekend" onclick="showDay('saturday')">Saturday</button>
+            <button class="day-btn weekend" onclick="showDay('sunday')">Sunday</button>
+        </div>
+
+        <!-- ═══ WEEKDAY SCHEDULE ═══ -->
+        <div class="schedule active" id="weekday">
+
+            <!-- Morning -->
+            <div class="time-block cat-sleep">
+                <div class="time-col">
+                    <div class="time-text">12am – 6am</div>
+                    <div class="duration">6 hrs</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">😴</div>
+                    <div class="block-info">
+                        <div class="block-title">Sleep — Full 6 Hours</div>
+                        <div class="block-desc">Non-negotiable. Brain memory consolidate karta hai sote waqt. Late night
+                            mat karo.</div>
+                    </div>
+                    <div class="block-tag tag-rest">REST</div>
+                </div>
+            </div>
+
+            <div class="time-block cat-morning">
+                <div class="time-col">
+                    <div class="time-text">6am – 7am</div>
+                    <div class="duration">1 hr</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">🌅</div>
+                    <div class="block-info">
+                        <div class="block-title">Morning Routine + Quick Recall</div>
+                        <div class="block-desc">Fresh ho jao. 15 min — kal jo DL seekha tha wo bina dekhey yaad karo
+                            (retrieval practice!)</div>
+                    </div>
+                    <div class="block-tag tag-review">RECALL</div>
+                </div>
+            </div>
+
+            <div class="time-block cat-college">
+                <div class="time-col">
+                    <div class="time-text">7am – 10am</div>
+                    <div class="duration">3 hrs</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">🏫</div>
+                    <div class="block-info">
+                        <div class="block-title">College Classes</div>
+                        <div class="block-desc">Poora dhyan class mein — notes banao, questions poochho. Class mein
+                            seekhoge to ghar pe revision fast hogi.</div>
+                    </div>
+                    <div class="block-tag tag-college">COLLEGE</div>
+                </div>
+            </div>
+
+            <div class="time-block cat-break">
+                <div class="time-col">
+                    <div class="time-text">10am – 11am</div>
+                    <div class="duration">1 hr</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">🍽️</div>
+                    <div class="block-info">
+                        <div class="block-title">Lunch + Rest</div>
+                        <div class="block-desc">Khana khao, thoda walk karo. Phone scroll mat karo — real break lo.
+                        </div>
+                    </div>
+                    <div class="block-tag tag-rest">BREAK</div>
+                </div>
+            </div>
+
+            <div class="time-block cat-bca">
+                <div class="time-col">
+                    <div class="time-text">11am – 1pm</div>
+                    <div class="duration">2 hrs</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">📚</div>
+                    <div class="block-info">
+                        <div class="block-title">BCA Syllabus — 2 Subjects</div>
+                        <div class="block-desc">Aaj ke 2 subjects padho — notes banao, practice karo. Pomodoro: 45 min
+                            on, 10 min off.</div>
+                    </div>
+                    <div class="block-tag tag-bca">BCA</div>
+                </div>
+            </div>
+
+            <div class="time-block cat-break">
+                <div class="time-col">
+                    <div class="time-text">1pm – 2pm</div>
+                    <div class="duration">1 hr</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">💤</div>
+                    <div class="block-info">
+                        <div class="block-title">Power Nap + Break</div>
+                        <div class="block-desc">20-30 min nap — memory boost karta hai. Baaki time free — walk, music,
+                            kuch bhi.</div>
+                    </div>
+                    <div class="block-tag tag-rest">RECHARGE</div>
+                </div>
+            </div>
+
+            <div class="time-block cat-bca">
+                <div class="time-col">
+                    <div class="time-text">2pm – 5pm</div>
+                    <div class="duration">3 hrs</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">📝</div>
+                    <div class="block-info">
+                        <div class="block-title">BCA Syllabus — Remaining 3 Subjects</div>
+                        <div class="block-desc">Baaki 3 subjects cover karo. Assignments, practicals, exam prep. Ek ek
+                            karo — rush mat karo.</div>
+                    </div>
+                    <div class="block-tag tag-bca">BCA</div>
+                </div>
+            </div>
+
+            <div class="time-block cat-break">
+                <div class="time-col">
+                    <div class="time-text">5pm – 6pm</div>
+                    <div class="duration">1 hr</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">🚶</div>
+                    <div class="block-info">
+                        <div class="block-title">Evening Break — Fresh Dimag</div>
+                        <div class="block-desc">Walk karo, kuch khao, fresh ho jao. Ye transition time hai — DL ke liye
+                            brain ready hoga.</div>
+                    </div>
+                    <div class="block-tag tag-rest">TRANSITION</div>
+                </div>
+            </div>
+
+            <!-- DL TIME — MAIN BLOCK -->
+            <div class="time-block cat-dl">
+                <div class="time-col">
+                    <div class="time-text">6pm – 8:30pm</div>
+                    <div class="duration">2.5 hrs ⭐</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">🧠</div>
+                    <div class="block-info">
+                        <div class="block-title">DEEP LEARNING — Main Session</div>
+                        <div class="block-desc">Ye tera golden time hai. Phone silent. VS Code open. Focus mode ON.
+                        </div>
+                    </div>
+                    <div class="block-tag tag-dl">DL CORE</div>
+                </div>
+            </div>
+
+            <!-- DL BREAKDOWN -->
+            <div class="dl-detail">
+                <h3>⚡ DL Session Breakdown — 2.5 Hours Kaise Use Karo</h3>
+                <div class="dl-steps">
+                    <div class="dl-step">
+                        <div class="step-time">6:00 – 6:10 (10 min)</div>
+                        <div class="step-title">🔁 Recall Karo</div>
+                        <div class="step-desc">Kal kya seekha tha — bina dekhey notebook mein likho. Gaps dikhengi.
+                        </div>
+                    </div>
+                    <div class="dl-step">
+                        <div class="step-time">6:10 – 7:00 (50 min)</div>
+                        <div class="step-title">📖 Naya Concept</div>
+                        <div class="step-desc">Video/docs se ek topic seekho. Notes banao — apne words mein, copy-paste
+                            nahi.</div>
+                    </div>
+                    <div class="dl-step">
+                        <div class="step-time">7:00 – 7:10 (10 min)</div>
+                        <div class="step-title">☕ Mini Break</div>
+                        <div class="step-desc">Paani piyo, thoda walk. Brain consolidate karta hai is waqt.</div>
+                    </div>
+                    <div class="dl-step">
+                        <div class="step-time">7:10 – 8:10 (60 min)</div>
+                        <div class="step-title">💻 Code Karo</div>
+                        <div class="step-desc">Notes band, video band. Khud se wahi code likho. Error aaye — khud fix
+                            karo pehle.</div>
+                    </div>
+                    <div class="dl-step">
+                        <div class="step-time">8:10 – 8:30 (20 min)</div>
+                        <div class="step-title">🧪 1 Practice Problem</div>
+                        <div class="step-desc">Kaggle ya HackerRank se ek problem solve karo us topic pe. Small but
+                            powerful habit.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="time-block cat-project">
+                <div class="time-col">
+                    <div class="time-text">8:30 – 9:30pm</div>
+                    <div class="duration">1 hr</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">🔨</div>
+                    <div class="block-info">
+                        <div class="block-title">Project Work / Weekly Challenge</div>
+                        <div class="block-desc">Jo abhi chal raha hai uska project banao. Ya Kaggle notebook explore
+                            karo. Real building time.</div>
+                    </div>
+                    <div class="block-tag tag-project">PROJECT</div>
+                </div>
+            </div>
+
+            <div class="time-block cat-review">
+                <div class="time-col">
+                    <div class="time-text">9:30 – 10pm</div>
+                    <div class="duration">30 min</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">📓</div>
+                    <div class="block-info">
+                        <div class="block-title">Daily Review + GitHub Commit</div>
+                        <div class="block-desc">Aaj kya seekha — 3 lines likho diary mein. GitHub pe code push karo. Kal
+                            ka topic dekho.</div>
+                    </div>
+                    <div class="block-tag tag-review">REVIEW</div>
+                </div>
+            </div>
+
+            <div class="time-block cat-break">
+                <div class="time-col">
+                    <div class="time-text">10pm – 12am</div>
+                    <div class="duration">2 hrs</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">🎮</div>
+                    <div class="block-info">
+                        <div class="block-title">Free Time — Genuinely Free</div>
+                        <div class="block-desc">YouTube, games, dost se baat — jo chaaho. Guilt-free. Hard work ka
+                            reward hai ye.</div>
+                    </div>
+                    <div class="block-tag tag-rest">FREE</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ SATURDAY ═══ -->
+        <div class="schedule" id="saturday">
+
+            <div class="time-block cat-morning">
+                <div class="time-col">
+                    <div class="time-text">6am – 8am</div>
+                    <div class="duration">2 hrs</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">🌅</div>
+                    <div class="block-info">
+                        <div class="block-title">Morning Routine + Light BCA Revision</div>
+                        <div class="block-desc">Iss hafte ka BCA syllabus quick revision. Notes ek baar dekho.</div>
+                    </div>
+                    <div class="block-tag tag-bca">BCA REVISION</div>
+                </div>
+            </div>
+
+            <div class="time-block cat-dl">
+                <div class="time-col">
+                    <div class="time-text">8am – 11am</div>
+                    <div class="duration">3 hrs ⭐</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">🔥</div>
+                    <div class="block-info">
+                        <div class="block-title">DEEP LEARNING — Long Session</div>
+                        <div class="block-desc">Iss hafte jo topics chhoot gaye — cover karo. Ya ek topic ka deep dive
+                            karo. No rush.</div>
+                    </div>
+                    <div class="block-tag tag-dl">DEEP DIVE</div>
+                </div>
+            </div>
+
+            <div class="time-block cat-break">
+                <div class="time-col">
+                    <div class="time-text">11am – 12pm</div>
+                    <div class="duration">1 hr</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">🍽️</div>
+                    <div class="block-info">
+                        <div class="block-title">Lunch + Walk</div>
+                        <div class="block-desc">Achha khao, bahar jao. Screen se break zaroori hai.</div>
+                    </div>
+                    <div class="block-tag tag-rest">BREAK</div>
+                </div>
+            </div>
+
+            <div class="time-block cat-project">
+                <div class="time-col">
+                    <div class="time-text">12pm – 3pm</div>
+                    <div class="duration">3 hrs</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">🏗️</div>
+                    <div class="block-info">
+                        <div class="block-title">Weekly Project Build</div>
+                        <div class="block-desc">Is hafte ka project aaj finish karo ya aage badho. Real code, real
+                            output. GitHub push karo.</div>
+                    </div>
+                    <div class="block-tag tag-project">BUILD</div>
+                </div>
+            </div>
+
+            <div class="time-block cat-break">
+                <div class="time-col">
+                    <div class="time-text">3pm – 10pm</div>
+                    <div class="duration">7 hrs</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">🎉</div>
+                    <div class="block-info">
+                        <div class="block-title">Complete Rest — Earned It!</div>
+                        <div class="block-desc">Dost, outing, movies, kuch bhi. Tu 5 din kaam kar chuka hai — ye break
+                            deserve karta hai.</div>
+                    </div>
+                    <div class="block-tag tag-rest">FREEDOM</div>
+                </div>
+            </div>
+
+            <div class="time-block cat-review">
+                <div class="time-col">
+                    <div class="time-text">10pm – 11pm</div>
+                    <div class="duration">1 hr</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">📊</div>
+                    <div class="block-info">
+                        <div class="block-title">Weekly Review</div>
+                        <div class="block-desc">Is hafte kya seekha — likho. Kahan struggle kiya — note karo. Agla hafte
+                            ka plan banao.</div>
+                    </div>
+                    <div class="block-tag tag-review">WEEKLY REVIEW</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ SUNDAY ═══ -->
+        <div class="schedule" id="sunday">
+
+            <div class="time-block cat-morning">
+                <div class="time-col">
+                    <div class="time-text">6am – 9am</div>
+                    <div class="duration">3 hrs</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">😴</div>
+                    <div class="block-info">
+                        <div class="block-title">Sleep In + Slow Morning</div>
+                        <div class="block-desc">Ek din late uthna okay hai. Chai piyo, aaram se breakfast karo. No
+                            screens for 1 hour.</div>
+                    </div>
+                    <div class="block-tag tag-rest">REST</div>
+                </div>
+            </div>
+
+            <div class="time-block cat-dl">
+                <div class="time-col">
+                    <div class="time-text">9am – 11am</div>
+                    <div class="duration">2 hrs</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">🔄</div>
+                    <div class="block-info">
+                        <div class="block-title">Hafte Ka Complete Revision</div>
+                        <div class="block-desc">Is poore hafte ke DL topics ek baar phir dekho — bina notes dekhey yaad
+                            karo. Jo bhool gaye — wahi sirf dekho.</div>
+                    </div>
+                    <div class="block-tag tag-review">SPACED REVISION</div>
+                </div>
+            </div>
+
+            <div class="time-block cat-project">
+                <div class="time-col">
+                    <div class="time-text">11am – 1pm</div>
+                    <div class="duration">2 hrs</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">🏆</div>
+                    <div class="block-info">
+                        <div class="block-title">Kaggle Notebook / Mini Challenge</div>
+                        <div class="block-desc">Ek beginner Kaggle notebook explore karo ya apna code refactor karo.
+                            Real world exposure.</div>
+                    </div>
+                    <div class="block-tag tag-project">KAGGLE</div>
+                </div>
+            </div>
+
+            <div class="time-block cat-break">
+                <div class="time-col">
+                    <div class="time-text">1pm – 8pm</div>
+                    <div class="duration">7 hrs</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">🌿</div>
+                    <div class="block-info">
+                        <div class="block-title">Complete Rest Day</div>
+                        <div class="block-desc">Burnout se bachna padega. Family, friends, outing — kuch bhi. Brain
+                            recharge hoga aur Monday fresh start milega.</div>
+                    </div>
+                    <div class="block-tag tag-rest">RECHARGE</div>
+                </div>
+            </div>
+
+            <div class="time-block cat-review">
+                <div class="time-col">
+                    <div class="time-text">8pm – 9pm</div>
+                    <div class="duration">1 hr</div>
+                </div>
+                <div class="content-col">
+                    <div class="emoji">📅</div>
+                    <div class="block-info">
+                        <div class="block-title">Next Week Planning</div>
+                        <div class="block-desc">Agla hafte kaunse DL topics hain — roadmap dekho. BCA ke assignments
+                            check karo. 10 min mein plan ready.</div>
+                    </div>
+                    <div class="block-tag tag-review">PLAN</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PHASE TRACKER -->
+        <div class="phase-now">
+            <h3>📍 ABHI TU KAHAN HAI — PHASE 1 START</h3>
+            <p style="font-size:13px; color:var(--muted); margin-bottom:8px;">Python decent aata hai — seedha NumPy +
+                Pandas se shuru karo!</p>
+            <div class="phase-bar">
+                <div class="phase-fill" id="phaseBar"></div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <span style="font-size:11px; font-family:'Space Mono',monospace; color:var(--green);">✅ Python Basics —
+                    DONE</span>
+                <span style="font-size:11px; font-family:'Space Mono',monospace; color:var(--green);">✅ Functions/OOP —
+                    DONE</span>
+                <span style="font-size:11px; font-family:'Space Mono',monospace; color:var(--yellow);">⏳ NumPy —
+                    NEXT</span>
+                <span style="font-size:11px; font-family:'Space Mono',monospace; color:var(--muted);">⬜ Pandas</span>
+                <span style="font-size:11px; font-family:'Space Mono',monospace; color:var(--muted);">⬜
+                    Matplotlib</span>
+                <span style="font-size:11px; font-family:'Space Mono',monospace; color:var(--muted);">⬜ ML Basics</span>
+            </div>
+        </div>
+
+        <!-- AI USAGE GUIDE -->
+        <div class="ai-box">
+            <h3>🤖 AI Ka Sahi Use — Daily Kaise Karo</h3>
+            <div class="ai-row"><span>✅</span><span><span class="ai-do">DO:</span> "Ye error kya bol raha hai mujhe
+                    samjha" — error explain karwao, solution nahi</span></div>
+            <div class="ai-row"><span>✅</span><span><span class="ai-do">DO:</span> "NumPy broadcasting ka ek alag
+                    example do jo docs mein nahi hai" — extra examples maango</span></div>
+            <div class="ai-row"><span>✅</span><span><span class="ai-do">DO:</span> "Main ye concept aise samjha — kya ye
+                    sahi hai?" — apni understanding verify karo</span></div>
+            <div class="ai-row"><span>✅</span><span><span class="ai-do">DO:</span> "Mujhe 5 practice problems do NumPy
+                    pe — solutions mat dena abhi" — problems maango</span></div>
+            <div class="ai-row"><span>✅</span><span><span class="ai-do">DO:</span> "Mera code review karo — kya better
+                    kar sakte hain" — code improve karo</span></div>
+            <hr style="border-color:var(--border); margin:12px 0;">
+            <div class="ai-row"><span>❌</span><span><span class="ai-dont">NEVER:</span> "Ye NumPy assignment solve kar
+                    do" — khud karo warna kuch nahi sikhega</span></div>
+            <div class="ai-row"><span>❌</span><span><span class="ai-dont">NEVER:</span> "Poora code likh do" — ek baar
+                    bhi aisa kiya to habit ban jaati hai</span></div>
+            <div class="ai-row"><span>❌</span><span><span class="ai-dont">NEVER:</span> Seedha answer maango bina khud
+                    try kiye — pehle 20 min khud socho</span></div>
+        </div>
+
+        <!-- WEEKLY FOCUS -->
+        <div class="weekly">
+            <h3>📅 Weekly DL Focus — Pehle 2 Mahine</h3>
+            <div class="weekly-grid">
+                <div class="w-item">
+                    <div class="w-day">WEEK 1–2</div>
+                    <div class="w-focus">NumPy Master</div>
+                    <div class="w-desc">Arrays, slicing, broadcasting, matrix ops. Project: Image ko NumPy array mein
+                        manipulate karo.</div>
+                </div>
+                <div class="w-item">
+                    <div class="w-day">WEEK 3–4</div>
+                    <div class="w-focus">Pandas Pro</div>
+                    <div class="w-desc">Load, clean, transform, group. Project: Titanic dataset EDA karo.</div>
+                </div>
+                <div class="w-item">
+                    <div class="w-day">WEEK 5–6</div>
+                    <div class="w-focus">Visualization</div>
+                    <div class="w-desc">Matplotlib + Seaborn. Project: Full data story — 5 charts, 5 insights.</div>
+                </div>
+                <div class="w-item">
+                    <div class="w-day">WEEK 7–8</div>
+                    <div class="w-focus">Maths Refresh</div>
+                    <div class="w-desc">3Blue1Brown — Linear Algebra + Calculus. Concept level only. No deep theory.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TIPS -->
+        <div class="tips-box">
+            <h3>💡 Smart Tips — Timetable Actually Follow Karne Ke Liye</h3>
+            <div class="tip">
+                <div class="tip-icon">📵</div>
+                <div class="tip-text"><strong>DL session mein phone doosre room mein rakho.</strong> Notifications =
+                    focus break = 20 min waste. Notifications band karo, physically door rakho.</div>
+            </div>
+            <div class="tip">
+                <div class="tip-icon">🎯</div>
+                <div class="tip-text"><strong>Roz ek chota goal set karo — "aaj NumPy indexing samajhni hai".</strong>
+                    "Deep Learning seekhna hai" — ye goal nahi hai. Too vague. Specific rakho.</div>
+            </div>
+            <div class="tip">
+                <div class="tip-icon">📊</div>
+                <div class="tip-text"><strong>GitHub streak maintain karo.</strong> Roz ek commit — chahe ek line ka
+                    code ho. Visual progress bahut motivating hoti hai. Profile green karo!</div>
+            </div>
+            <div class="tip">
+                <div class="tip-icon">🔁</div>
+                <div class="tip-text"><strong>Timetable miss hua — guilt mat lo.</strong> Ek din miss hoga — okay hai.
+                    Ek hafte miss hoga — problem hai. Miss hone ke baad seedha kal se wapas aao.</div>
+            </div>
+            <div class="tip">
+                <div class="tip-icon">🗣️</div>
+                <div class="tip-text"><strong>Jo seekha use AI ko samjhao.</strong> "Main tujhe rubber duck hun — mujhe
+                    ye concept samjha." Jahan atak jaao wahan gap hai. Ye Feynman technique hai.</div>
+            </div>
+            <div class="tip">
+                <div class="tip-icon">⏰</div>
+                <div class="tip-text"><strong>Pomodoro technique use karo — 45 min on, 10 min off.</strong> Brain 45 min
+                    se zyada focused nahi reh sakta effectively. Breaks productivity badhate hain, ghatate nahi.</div>
+            </div>
+        </div>
+
+        <div
+            style="text-align:center; padding:40px 0 20px; color:var(--muted); font-family:'Space Mono',monospace; font-size:12px;">
+            Consistency > Intensity &nbsp;•&nbsp; Ek din ek topic &nbsp;•&nbsp; You got this bhai! 🚀
+        </div>
+
+    </div>
+
+    <script>
+        function showDay( day ) {
+            document.querySelectorAll( '.schedule' ).forEach( s => s.classList.remove( 'active' ) );
+            document.querySelectorAll( '.day-btn' ).forEach( b => b.classList.remove( 'active' ) );
+            document.getElementById( day ).classList.add( 'active' );
+            event.target.classList.add( 'active' );
+        }
+        // Animate phase bar on load
+        setTimeout( () => {
+            const bar = document.getElementById( 'phaseBar' );
+            if ( bar ) bar.style.width = '15%';
+        }, 300 );
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Learning Visual Guide</title>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --card: #1a1a26;
+            --border: #2a2a3e;
+            --accent: #00f5a0;
+            --accent2: #7c3aed;
+            --accent3: #f59e0b;
+            --accent4: #ef4444;
+            --text: #e8e8f0;
+            --muted: #6b6b8a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* NAV */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            height: 56px;
+            overflow-x: auto;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 11px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        nav button:hover {
+            color: var(--accent);
+        }
+
+        nav button.active {
+            background: rgba(0, 245, 160, 0.1);
+            color: var(--accent);
+        }
+
+        /* SECTIONS */
+        .section {
+            display: none;
+            padding: 80px 24px 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        p {
+            color: #b0b0c8;
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        .tag {
+            display: inline-block;
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            margin-bottom: 16px;
+            letter-spacing: 2px;
+        }
+
+        /* GRID CARDS */
+        .grid {
+            display: grid;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .card h3 {
+            font-size: 15px;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
+
+        .card p {
+            font-size: 13px;
+        }
+
+        /* NEURON ANIMATION */
+        .neuron-demo {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 24px 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .neuron-canvas {
+            width: 100%;
+            height: 260px;
+            position: relative;
+        }
+
+        .neuron {
+            position: absolute;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Mono', monospace;
+            font-size: 9px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 2;
+        }
+
+        .neuron.input {
+            background: rgba(124, 58, 237, 0.2);
+            border: 2px solid var(--accent2);
+            color: var(--accent2);
+        }
+
+        .neuron.hidden {
+            background: rgba(0, 245, 160, 0.1);
+            border: 2px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .neuron.output {
+            background: rgba(245, 158, 11, 0.2);
+            border: 2px solid var(--accent3);
+            color: var(--accent3);
+        }
+
+        .neuron.active {
+            transform: scale(1.3);
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        svg.connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .conn {
+            stroke: var(--border);
+            stroke-width: 1.5;
+            fill: none;
+            transition: stroke 0.3s, stroke-width 0.3s;
+        }
+
+        .conn.active {
+            stroke: var(--accent);
+            stroke-width: 2.5;
+            stroke-dasharray: 5;
+            animation: dash 0.5s linear infinite;
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -10;
+            }
+        }
+
+        /* TRANSFORMER VISUAL */
+        .transformer-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 12px 0;
+            transition: all 0.3s;
+        }
+
+        .transformer-box:hover {
+            border-color: var(--accent2);
+        }
+
+        .tf-title {
+            font-size: 13px;
+            font-family: 'Space Mono', monospace;
+            color: var(--accent2);
+            margin-bottom: 8px;
+        }
+
+        .tf-desc {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .attention-demo {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .words-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 16px 0;
+        }
+
+        .word-chip {
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Space Mono', monospace;
+            font-size: 13px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            user-select: none;
+        }
+
+        .word-chip:hover {
+            border-color: var(--accent);
+        }
+
+        .word-chip.selected {
+            background: rgba(0, 245, 160, 0.15);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .word-chip.attended {
+            border-color: var(--accent3);
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .word-chip.attended-high {
+            border-color: var(--accent3);
+            background: rgba(245, 158, 11, 0.25);
+            color: var(--accent3);
+            font-weight: 700;
+        }
+
+        .attention-label {
+            font-size: 12px;
+            color: var(--muted);
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* ROADMAP TIMELINE */
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+            margin-top: 24px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .tl-item {
+            position: relative;
+            margin-bottom: 28px;
+        }
+
+        .tl-dot {
+            position: absolute;
+            left: -26px;
+            top: 4px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            background: var(--bg);
+            transition: all 0.3s;
+        }
+
+        .tl-item:hover .tl-dot {
+            background: var(--accent);
+            box-shadow: 0 0 12px var(--accent);
+        }
+
+        .tl-phase {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: var(--accent);
+            letter-spacing: 1px;
+        }
+
+        .tl-title {
+            font-size: 17px;
+            font-weight: 700;
+            margin: 4px 0;
+        }
+
+        .tl-builds {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .build-chip {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(0, 245, 160, 0.08);
+            border: 1px solid rgba(0, 245, 160, 0.2);
+            color: var(--accent);
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* LLM FLOW */
+        .flow-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 16px 0;
+            flex-wrap: wrap;
+        }
+
+        .flow-box {
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'Space Mono', monospace;
+            text-align: center;
+        }
+
+        .flow-arrow {
+            color: var(--muted);
+            font-size: 18px;
+        }
+
+        .fbox-1 {
+            background: rgba(124, 58, 237, 0.15);
+            border: 1px solid var(--accent2);
+            color: #a78bfa;
+        }
+
+        .fbox-2 {
+            background: rgba(0, 245, 160, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .fbox-3 {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--accent3);
+            color: var(--accent3);
+        }
+
+        .fbox-4 {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--accent4);
+            color: #f87171;
+        }
+
+        /* TOKEN ANIMATION */
+        .token-demo {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .token-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin: 12px 0;
+        }
+
+        .token {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            border: 1px solid;
+        }
+
+        .t1 {
+            background: rgba(124, 58, 237, 0.15);
+            border-color: var(--accent2);
+            color: #a78bfa;
+        }
+
+        .t2 {
+            background: rgba(0, 245, 160, 0.1);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .t3 {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: var(--accent3);
+            color: var(--accent3);
+        }
+
+        .t4 {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--accent4);
+            color: #f87171;
+        }
+
+        .t5 {
+            background: rgba(20, 184, 166, 0.1);
+            border-color: #14b8a6;
+            color: #5eead4;
+        }
+
+        /* PROJECTS SHOWCASE */
+        .project-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            border-color: var(--accent3);
+            transform: translateY(-3px);
+        }
+
+        .proj-phase {
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            color: var(--accent3);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .proj-title {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .proj-tech {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .tech-chip {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* INTERACTIVE BUTTONS */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            background: rgba(0, 245, 160, 0.05);
+            cursor: pointer;
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            transition: all 0.2s;
+            margin: 4px;
+        }
+
+        .btn:hover {
+            background: rgba(0, 245, 160, 0.15);
+        }
+
+        .btn.active {
+            background: rgba(0, 245, 160, 0.2);
+        }
+
+        /* DIVIDER */
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 28px 0;
+        }
+
+        /* COMPARE TABLE */
+        .compare {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .compare th {
+            background: var(--surface);
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 12px;
+            font-family: 'Space Mono', monospace;
+            color: var(--muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .compare td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            color: #b0b0c8;
+        }
+
+        .compare tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .yes {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .no {
+            color: var(--muted);
+        }
+
+        /* SCROLL HINT */
+        .scroll-hint {
+            text-align: center;
+            padding: 40px 0 20px;
+            color: var(--muted);
+            font-size: 12px;
+            font-family: 'Space Mono', monospace;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav id="nav">
+        <button class="active" onclick="show('home')">🏠 Home</button>
+        <button onclick="show('how-model')">🧠 Model Kaise Kaam Karta</button>
+        <button onclick="show('neuron')">⚡ Neuron Demo</button>
+        <button onclick="show('transformer')">🔮 Transformer Kya Hai</button>
+        <button onclick="show('llm')">💬 LLM Kya Hai</button>
+        <button onclick="show('attention')">👁️ Attention Demo</button>
+        <button onclick="show('roadmap')">🗺️ Roadmap → Projects</button>
+    </nav>
+
+    <!-- ════════════════ HOME ════════════════ -->
+    <section class="section active" id="home">
+        <div class="tag">VISUAL GUIDE</div>
+        <h1>Deep Learning<br><span style="color:var(--accent)">Visual Explainer</span></h1>
+        <p style="margin-top:16px; max-width:540px;">Bhai ye tera interactive guide hai — models kaise kaam karte hain,
+            transformer kya hai, LLM kaise sochta hai — sab visually samjha!</p>
+
+        <div class="grid grid-2" style="margin-top:32px;">
+            <div class="card" onclick="show('how-model')" style="cursor:pointer">
+                <h3>🧠 Model Kaise Sikhta Hai?</h3>
+                <p>Data → Weights → Prediction — poora cycle visualize karo</p>
+            </div>
+            <div class="card" onclick="show('neuron')" style="cursor:pointer">
+                <h3>⚡ Neural Network Live Demo</h3>
+                <p>Neurons click karo aur dekho signal kaise travel karta hai</p>
+            </div>
+            <div class="card" onclick="show('transformer')" style="cursor:pointer">
+                <h3>🔮 Transformer Architecture</h3>
+                <p>BERT, GPT ke andar kya hota hai — step by step</p>
+            </div>
+            <div class="card" onclick="show('llm')" style="cursor:pointer">
+                <h3>💬 LLM Kaise Sochta Hai?</h3>
+                <p>ChatGPT ke andar kya hota hai — token se response tak</p>
+            </div>
+            <div class="card" onclick="show('attention')" style="cursor:pointer">
+                <h3>👁️ Attention Mechanism Demo</h3>
+                <p>Word click karo — dekho model kis word pe focus karta hai</p>
+            </div>
+            <div class="card" onclick="show('roadmap')" style="cursor:pointer">
+                <h3>🗺️ Roadmap ke Baad Kya Banega?</h3>
+                <p>Har phase ke baad konsa project ban sakta hai</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ════════════════ HOW MODEL WORKS ════════════════ -->
+    <section class="section" id="how-model">
+        <div class="tag">FOUNDATION</div>
+        <h1>Model Kaise <span style="color:var(--accent)">Sikhta Hai?</span></h1>
+        <p style="margin-top:12px;">Simple example: model ko sikhana hai ki photo mein Cat hai ya Dog.</p>
+
+        <hr class="divider">
+
+        <h2>Step 1 — Data Input</h2>
+        <p>Image ke pixels numbers mein convert hote hain. Ek 28×28 image = 784 numbers.</p>
+        <div class="flow-row" style="margin-top:16px;">
+            <div class="flow-box fbox-1">🖼️ Image<br><small>Cat.jpg</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box fbox-2">[0.2, 0.8, 0.1<br>0.9, 0.3, ...]<br><small>784 numbers</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box fbox-3">Neural<br>Network</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box fbox-4">Cat: 92%<br>Dog: 8%</div>
+        </div>
+
+        <hr class="divider">
+        <h2>Step 2 — Forward Pass (Prediction)</h2>
+        <p>Input → hidden layers → output. Har layer numbers transform karti hai.</p>
+        <div
+            style="background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-top:16px;">
+            <div class="flow-row">
+                <div class="flow-box fbox-1">Input<br><small>784 neurons</small></div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box fbox-2">Hidden 1<br><small>256 neurons</small></div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box fbox-2">Hidden 2<br><small>128 neurons</small></div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box fbox-3">Output<br><small>2 neurons</small></div>
+            </div>
+            <p style="margin-top:16px; font-size:13px;">Har connection pe ek <b style="color:var(--accent)">weight</b>
+                hota hai. Ye weights hi model ki "memory" hain.</p>
+        </div>
+
+        <hr class="divider">
+        <h2>Step 3 — Loss Calculate Karo</h2>
+        <p>Model ne bola "Cat: 30%, Dog: 70%" — lekin answer Cat tha. Ye galti = <b
+                style="color:var(--accent4)">Loss</b>.</p>
+        <div class="grid grid-2" style="margin-top:16px;">
+            <div class="card">
+                <h3>❌ Galat Prediction</h3>
+                <p>Predicted: Dog 70%<br>Actual: Cat ✓<br><span style="color:var(--accent4)">Loss = HIGH (1.2)</span>
+                </p>
+            </div>
+            <div class="card">
+                <h3>✅ Sahi Prediction</h3>
+                <p>Predicted: Cat 95%<br>Actual: Cat ✓<br><span style="color:var(--accent)">Loss = LOW (0.05)</span></p>
+            </div>
+        </div>
+
+        <hr class="divider">
+        <h2>Step 4 — Backpropagation (Weights Update)</h2>
+        <p>Galti ko backward propagate karo — har weight ko thoda adjust karo. Ye process laakhon baar repeat hota hai.
+        </p>
+        <div
+            style="background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; margin-top:16px;">
+            <div class="flow-row">
+                <div class="flow-box fbox-4">Loss<br><small>0.8</small></div>
+                <div class="flow-arrow">←</div>
+                <div class="flow-box fbox-3">Gradients<br><small>calculate</small></div>
+                <div class="flow-arrow">←</div>
+                <div class="flow-box fbox-2">Weights<br><small>update</small></div>
+                <div class="flow-arrow">←</div>
+                <div class="flow-box fbox-1">Repeat<br><small>1000x</small></div>
+            </div>
+            <p style="margin-top:12px; font-size:13px; color:var(--muted);">w_new = w_old - learning_rate × gradient</p>
+        </div>
+
+        <hr class="divider">
+        <h2>Simple Analogy 💡</h2>
+        <div class="card" style="border-color:var(--accent3)">
+            <h3>Cricket Player Ki Tarah!</h3>
+            <p>Pehli baar bat karo → miss karo → samjho kahan galti hui → next ball pe adjust karo → improvement ho →
+                10,000 balls ke baad expert ban jao.<br><br>Model bhi aise hi: data dekho → predict karo → galti dekho →
+                weights adjust karo → repeat → expert ban jao! 🏏</p>
+        </div>
+    </section>
+
+    <!-- ════════════════ NEURON DEMO ════════════════ -->
+    <section class="section" id="neuron">
+        <div class="tag">INTERACTIVE</div>
+        <h1>Neural Network <span style="color:var(--accent)">Live Demo</span></h1>
+        <p style="margin-top:12px;">Input neurons pe click karo — dekho signal kaise flow hota hai!</p>
+
+        <div class="neuron-demo">
+            <div
+                style="display:flex; gap:24px; justify-content:space-between; font-family:'Space Mono',monospace; font-size:11px; color:var(--muted); margin-bottom:12px;">
+                <span style="color:var(--accent2)">INPUT LAYER</span>
+                <span style="color:var(--accent)">HIDDEN LAYER 1 &nbsp;&nbsp; HIDDEN LAYER 2</span>
+                <span style="color:var(--accent3)">OUTPUT</span>
+            </div>
+            <div class="neuron-canvas" id="neuronCanvas">
+                <svg class="connections" id="connSvg"></svg>
+            </div>
+            <p style="font-size:12px; color:var(--muted); margin-top:12px; font-family:'Space Mono',monospace;">↑ Click
+                karo input neurons pe (purple circles)</p>
+        </div>
+
+        <hr class="divider">
+        <h2>Activation Function Kya Karta Hai?</h2>
+        <p>Neuron decide karta hai — "kitna activate hoon?" Ye activation function decide karta hai.</p>
+        <div class="grid grid-3" style="margin-top:16px;">
+            <div class="card">
+                <h3>ReLU</h3>
+                <p>max(0, x)<br>Negative = 0<br>Positive = as it is<br><br><span
+                        style="color:var(--accent); font-family:'Space Mono',monospace; font-size:12px;">Most
+                        common</span></p>
+            </div>
+            <div class="card">
+                <h3>Sigmoid</h3>
+                <p>Output: 0 to 1<br>Probability ke liye<br><br><span
+                        style="color:var(--accent3); font-family:'Space Mono',monospace; font-size:12px;">Binary
+                        output</span></p>
+            </div>
+            <div class="card">
+                <h3>Softmax</h3>
+                <p>Multiple classes<br>Sab probabilities<br>sum = 1.0<br><br><span
+                        style="color:var(--accent2); font-family:'Space Mono',monospace; font-size:12px;">Multi-class</span>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ════════════════ TRANSFORMER ════════════════ -->
+    <section class="section" id="transformer">
+        <div class="tag">ARCHITECTURE</div>
+        <h1>Transformer <span style="color:var(--accent)">Kya Hai?</span></h1>
+        <p style="margin-top:12px;">2017 mein Google ne "Attention Is All You Need" paper diya — aur AI revolution aa
+            gayi. BERT, GPT, ChatGPT sab transformer pe based hain.</p>
+
+        <hr class="divider">
+        <h2>Problem Kya Thi Pehle?</h2>
+        <div class="grid grid-2" style="margin-top:16px;">
+            <div class="card" style="border-color:var(--accent4)">
+                <h3 style="color:var(--accent4)">❌ RNN/LSTM Problem</h3>
+                <p>Sequential processing — ek word ke baad dusra. Long sentences mein pehla word bhool jaata tha. Slow
+                    training.</p>
+            </div>
+            <div class="card" style="border-color:var(--accent)">
+                <h3>✅ Transformer Solution</h3>
+                <p>Parallel processing — sab words ek saath dekho. Long-range dependencies handle karo. Fast training on
+                    GPU!</p>
+            </div>
+        </div>
+
+        <hr class="divider">
+        <h2>Transformer Architecture — Block by Block</h2>
+
+        <div class="transformer-box" style="border-color:var(--accent4)">
+            <div class="tf-title">STEP 1 — INPUT EMBEDDING + POSITIONAL ENCODING</div>
+            <div class="tf-desc">Words ko numbers mein convert karo (embedding). Phir position ka information add karo —
+                "ye word sentence mein 3rd position pe hai". Transformer ko sequence ka order nahi pata hota, isliye
+                manually add karte hain.</div>
+        </div>
+        <div style="text-align:center; color:var(--muted); font-size:20px; margin:4px 0;">↓</div>
+
+        <div class="transformer-box" style="border-color:var(--accent2)">
+            <div class="tf-title">STEP 2 — MULTI-HEAD SELF-ATTENTION</div>
+            <div class="tf-desc">Har word dusre words pe "attend" karta hai — kitna related hoon main unse? "Bank" word
+                ka matlab context pe depend karta hai — "river bank" vs "bank account". Multiple heads = multiple
+                aspects pe focus simultaneously.</div>
+            <div class="flow-row" style="margin-top:12px;">
+                <div class="flow-box fbox-1">Query (Q)<br><small>Kya dhundh raha?</small></div>
+                <div class="flow-arrow">×</div>
+                <div class="flow-box fbox-2">Key (K)<br><small>Mere paas kya?</small></div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-box fbox-3">Attention<br><small>Score</small></div>
+                <div class="flow-arrow">×</div>
+                <div class="flow-box fbox-4">Value (V)<br><small>Actual info</small></div>
+            </div>
+        </div>
+        <div style="text-align:center; color:var(--muted); font-size:20px; margin:4px 0;">↓</div>
+
+        <div class="transformer-box" style="border-color:var(--accent)">
+            <div class="tf-title">STEP 3 — ADD & NORM (RESIDUAL CONNECTION)</div>
+            <div class="tf-desc">Original input + attention output ko add karo. Phir normalize karo. Ye "shortcut" deep
+                networks mein gradients ko flow karne deta hai — ResNet ka idea!</div>
+        </div>
+        <div style="text-align:center; color:var(--muted); font-size:20px; margin:4px 0;">↓</div>
+
+        <div class="transformer-box" style="border-color:var(--accent3)">
+            <div class="tf-title">STEP 4 — FEED FORWARD NETWORK</div>
+            <div class="tf-desc">Simple 2-layer neural network — attention ke output ko aur process karo. Ye "thinking"
+                karta hai — attention ne jo context diya use transform karta hai. Har position independently process
+                hota hai.</div>
+        </div>
+        <div style="text-align:center; color:var(--muted); font-size:20px; margin:4px 0;">↓</div>
+
+        <div class="transformer-box" style="border-color:var(--accent2)">
+            <div class="tf-title">STEP 5 — REPEAT N TIMES (LAYERS)</div>
+            <div class="tf-desc">Ye poora block N baar stack hota hai. GPT-3 mein 96 layers hain! Deeper = more complex
+                patterns learn kar sakta hai.</div>
+        </div>
+
+        <hr class="divider">
+        <h2>BERT vs GPT — Dono Transformer Hain, But Different!</h2>
+        <table class="compare">
+            <tr>
+                <th>Feature</th>
+                <th>BERT</th>
+                <th>GPT</th>
+            </tr>
+            <tr>
+                <td>Type</td>
+                <td class="yes">Encoder Only</td>
+                <td class="yes">Decoder Only</td>
+            </tr>
+            <tr>
+                <td>Direction</td>
+                <td>Bidirectional (L+R)</td>
+                <td>Left to Right only</td>
+            </tr>
+            <tr>
+                <td>Training</td>
+                <td>Masked word predict</td>
+                <td>Next word predict</td>
+            </tr>
+            <tr>
+                <td>Best for</td>
+                <td>Understanding text</td>
+                <td>Generating text</td>
+            </tr>
+            <tr>
+                <td>Use case</td>
+                <td>Classification, QA, NER</td>
+                <td>ChatGPT, text generation</td>
+            </tr>
+            <tr>
+                <td>Company</td>
+                <td>Google</td>
+                <td>OpenAI</td>
+            </tr>
+        </table>
+    </section>
+
+    <!-- ════════════════ LLM ════════════════ -->
+    <section class="section" id="llm">
+        <div class="tag">LLM</div>
+        <h1>LLM Kaise <span style="color:var(--accent)">Sochta Hai?</span></h1>
+        <p style="margin-top:12px;">LLM = Large Language Model. ChatGPT, Claude, Gemini sab LLM hain. Ye simply "next
+            word predict" karte hain — lekin itne accurate ki conversation jaisa lagta hai!</p>
+
+        <hr class="divider">
+        <h2>Tokenization — Pehla Step</h2>
+        <p>Text ko tokens mein todha jaata hai. Token = word ya word ka part.</p>
+        <div class="token-demo">
+            <p style="font-size:13px; color:var(--muted); margin-bottom:8px; font-family:'Space Mono',monospace;">Input:
+                "Deep Learning bahut powerful hai"</p>
+            <div class="token-row">
+                <span class="token t1">Deep</span>
+                <span class="token t2">Learn</span>
+                <span class="token t2">ing</span>
+                <span class="token t3">bah</span>
+                <span class="token t3">ut</span>
+                <span class="token t4">powerful</span>
+                <span class="token t5">hai</span>
+            </div>
+            <p style="font-size:12px; color:var(--muted); margin-top:8px;">7 tokens. "Learning" → "Learn" + "ing"
+                (subword tokenization)</p>
+        </div>
+
+        <hr class="divider">
+        <h2>LLM Training — Ek Simple Example</h2>
+        <div class="card" style="margin-top:16px; border-color:var(--accent2)">
+            <h3>Training Data (Internet ka sab text):</h3>
+            <p style="font-family:'Space Mono',monospace; font-size:13px; margin-top:8px; color:var(--accent)">
+                "The cat sat on the ___"
+            </p>
+            <p style="font-size:13px; margin-top:8px;">Model predict karta hai: "mat" (95%), "floor" (3%), "dog" (1%)...
+            </p>
+            <p style="font-size:13px; margin-top:8px; color:var(--muted)">Ye next-word prediction billions baar karne ke
+                baad model language samajh leta hai.</p>
+        </div>
+
+        <hr class="divider">
+        <h2>ChatGPT ko "Helpful" Kaise Banaya? — RLHF</h2>
+        <div class="timeline" style="margin-top:16px;">
+            <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div class="tl-phase">STEP 1</div>
+                <div class="tl-title">Pre-training</div>
+                <p style="font-size:13px; color:var(--muted)">Internet ka sab text pe train — Wikipedia, books, code,
+                    articles. Trillions of tokens. Sirf "next word predict" karna seekha.</p>
+            </div>
+            <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div class="tl-phase">STEP 2</div>
+                <div class="tl-title">Supervised Fine-tuning (SFT)</div>
+                <p style="font-size:13px; color:var(--muted)">Human trainers ne examples likhe — "Question X ka achha
+                    answer Y hota hai". Model ne ye examples se seekha.</p>
+            </div>
+            <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div class="tl-phase">STEP 3</div>
+                <div class="tl-title">Reward Model Training</div>
+                <p style="font-size:13px; color:var(--muted)">Humans ne multiple answers rank kiye — "A better hai B
+                    se". Ek reward model train kiya jo judge kare kaunsa answer achha hai.</p>
+            </div>
+            <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div class="tl-phase">STEP 4</div>
+                <div class="tl-title">RLHF — Reinforcement Learning from Human Feedback</div>
+                <p style="font-size:13px; color:var(--muted)">Reward model ki feedback se LLM ke weights update kiye —
+                    helpful, harmless, honest responses ke liye optimize kiya. Ye Claude ka bhi secret hai! 😄</p>
+            </div>
+        </div>
+
+        <hr class="divider">
+        <h2>Scale Kyun Matter Karta Hai?</h2>
+        <table class="compare">
+            <tr>
+                <th>Model</th>
+                <th>Parameters</th>
+                <th>Capability</th>
+            </tr>
+            <tr>
+                <td>GPT-1 (2018)</td>
+                <td>117M</td>
+                <td>Basic text completion</td>
+            </tr>
+            <tr>
+                <td>GPT-2 (2019)</td>
+                <td>1.5B</td>
+                <td>Coherent paragraphs</td>
+            </tr>
+            <tr>
+                <td>GPT-3 (2020)</td>
+                <td>175B</td>
+                <td>Few-shot learning, code</td>
+            </tr>
+            <tr>
+                <td>GPT-4 (2023)</td>
+                <td>~1.7T (est)</td>
+                <td>Reasoning, multimodal</td>
+            </tr>
+            <tr>
+                <td>LLaMA 3 (2024)</td>
+                <td>8B–70B</td>
+                <td>Open source, powerful</td>
+            </tr>
+        </table>
+        <p style="margin-top:12px; font-size:13px; color:var(--muted)">Parameters = weights. Zyada parameters = zyada
+            complex patterns learn kar sakta hai. Isliye "Large" Language Model!</p>
+    </section>
+
+    <!-- ════════════════ ATTENTION DEMO ════════════════ -->
+    <section class="section" id="attention">
+        <div class="tag">INTERACTIVE DEMO</div>
+        <h1>Attention <span style="color:var(--accent)">Mechanism</span></h1>
+        <p style="margin-top:12px;">Word pe click karo — dekho model kaunse words pe zyada "attend" karta hai
+            (highlighted = high attention).</p>
+
+        <div class="attention-demo">
+            <p class="attention-label" style="margin-bottom:8px;">SENTENCE 1 — Click any word:</p>
+            <div class="words-row" id="sent1">
+                <span class="word-chip" data-sent="1" data-idx="0" onclick="showAttention(1,0)">The</span>
+                <span class="word-chip" data-sent="1" data-idx="1" onclick="showAttention(1,1)">bank</span>
+                <span class="word-chip" data-sent="1" data-idx="2" onclick="showAttention(1,2)">was</span>
+                <span class="word-chip" data-sent="1" data-idx="3" onclick="showAttention(1,3)">near</span>
+                <span class="word-chip" data-sent="1" data-idx="4" onclick="showAttention(1,4)">the</span>
+                <span class="word-chip" data-sent="1" data-idx="5" onclick="showAttention(1,5)">river</span>
+            </div>
+            <div id="attn-info-1"
+                style="font-size:13px; color:var(--accent); font-family:'Space Mono',monospace; margin-top:8px; min-height:20px;">
+            </div>
+
+            <hr class="divider">
+
+            <p class="attention-label" style="margin-bottom:8px;">SENTENCE 2 — Click any word:</p>
+            <div class="words-row" id="sent2">
+                <span class="word-chip" data-sent="2" data-idx="0" onclick="showAttention(2,0)">I</span>
+                <span class="word-chip" data-sent="2" data-idx="1" onclick="showAttention(2,1)">deposited</span>
+                <span class="word-chip" data-sent="2" data-idx="2" onclick="showAttention(2,2)">money</span>
+                <span class="word-chip" data-sent="2" data-idx="3" onclick="showAttention(2,3)">at</span>
+                <span class="word-chip" data-sent="2" data-idx="4" onclick="showAttention(2,4)">the</span>
+                <span class="word-chip" data-sent="2" data-idx="5" onclick="showAttention(2,5)">bank</span>
+            </div>
+            <div id="attn-info-2"
+                style="font-size:13px; color:var(--accent3); font-family:'Space Mono',monospace; margin-top:8px; min-height:20px;">
+            </div>
+        </div>
+
+        <div class="card" style="border-color:var(--accent2)">
+            <h3>Samajh aaya? 🎯</h3>
+            <p>Sentence 1 mein "bank" → "river" pe high attention = nadi ka kinara.<br>Sentence 2 mein "bank" →
+                "deposited", "money" pe high attention = bank account.<br><br>Same word, alag context, alag meaning —
+                Transformer ye automatically samajhta hai!</p>
+        </div>
+
+        <hr class="divider">
+        <h2>Multi-Head Attention = Multiple Perspectives</h2>
+        <div class="grid grid-3" style="margin-top:16px;">
+            <div class="card">
+                <h3>Head 1</h3>
+                <p>Syntax pe focus — subject-verb agreement</p>
+            </div>
+            <div class="card">
+                <h3>Head 2</h3>
+                <p>Coreference — "he" = kaun?</p>
+            </div>
+            <div class="card">
+                <h3>Head 3</h3>
+                <p>Semantic meaning — word relationships</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ════════════════ ROADMAP PROJECTS ════════════════ -->
+    <section class="section" id="roadmap">
+        <div class="tag">YOUR JOURNEY</div>
+        <h1>Roadmap ke Baad <span style="color:var(--accent)">Kya Banega?</span></h1>
+        <p style="margin-top:12px;">Har phase complete karne ke baad tu ye projects build kar sakta hai — real, working
+            projects!</p>
+
+        <div class="grid grid-2" style="margin-top:32px;">
+            <div class="project-card">
+                <div class="proj-phase">PHASE 1 COMPLETE</div>
+                <div class="proj-title">📊 Data Analysis Dashboard</div>
+                <p style="font-size:13px; color:var(--muted)">Kaggle dataset lo, Pandas se clean karo,
+                    Matplotlib/Seaborn se beautiful graphs banao. Real insights nikalo.</p>
+                <div class="proj-tech">
+                    <span class="tech-chip">Python</span>
+                    <span class="tech-chip">Pandas</span>
+                    <span class="tech-chip">Seaborn</span>
+                    <span class="tech-chip">NumPy</span>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="proj-phase">PHASE 2 COMPLETE</div>
+                <div class="proj-title">🏠 House Price Predictor</div>
+                <p style="font-size:13px; color:var(--muted)">Features lo — rooms, area, location. Model train karo. New
+                    houses ki price predict karo. Deploy on Flask.</p>
+                <div class="proj-tech">
+                    <span class="tech-chip">Scikit-learn</span>
+                    <span class="tech-chip">XGBoost</span>
+                    <span class="tech-chip">Flask</span>
+                    <span class="tech-chip">Pandas</span>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="proj-phase">PHASE 3 COMPLETE</div>
+                <div class="proj-title">🔢 Handwriting Recognizer</div>
+                <p style="font-size:13px; color:var(--muted)">MNIST digits — apna neural network scratch se banao
+                    PyTorch mein. 98%+ accuracy achieve karo.</p>
+                <div class="proj-tech">
+                    <span class="tech-chip">PyTorch</span>
+                    <span class="tech-chip">Neural Networks</span>
+                    <span class="tech-chip">Backprop</span>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="proj-phase">PHASE 4 COMPLETE</div>
+                <div class="proj-title">📸 Real-time Object Detector</div>
+                <p style="font-size:13px; color:var(--muted)">Webcam se live video le, YOLOv8 se objects detect karo.
+                    Apne ghar ki cheezein recognize karo. Full Stack app mein integrate karo!</p>
+                <div class="proj-tech">
+                    <span class="tech-chip">YOLOv8</span>
+                    <span class="tech-chip">OpenCV</span>
+                    <span class="tech-chip">Transfer Learning</span>
+                    <span class="tech-chip">FastAPI</span>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="proj-phase">PHASE 5 COMPLETE</div>
+                <div class="proj-title">💬 AI Chatbot with RAG</div>
+                <p style="font-size:13px; color:var(--muted)">Apni notes ya documents upload karo. BERT/LLM se QA karo.
+                    "Mere notes mein Newton ka law kya hai?" — instant answer!</p>
+                <div class="proj-tech">
+                    <span class="tech-chip">HuggingFace</span>
+                    <span class="tech-chip">Transformers</span>
+                    <span class="tech-chip">LangChain</span>
+                    <span class="tech-chip">React</span>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="proj-phase">PHASE 6 COMPLETE</div>
+                <div class="proj-title">🚀 AI SaaS Product</div>
+                <p style="font-size:13px; color:var(--muted)">Full Stack + AI: Resume parser, Image generator, Code
+                    reviewer — deploy karo, portfolio mein rakho, internship/job lo!</p>
+                <div class="proj-tech">
+                    <span class="tech-chip">Full Stack</span>
+                    <span class="tech-chip">DL Model</span>
+                    <span class="tech-chip">Docker</span>
+                    <span class="tech-chip">Cloud</span>
+                </div>
+            </div>
+        </div>
+
+        <hr class="divider">
+        <h2>Final Career Picture 🎯</h2>
+        <div class="card" style="border-color:var(--accent); margin-top:16px;">
+            <h3>Tujhe Kya Milega?</h3>
+            <p style="margin-top:8px;">Tu BCA ke saath ye roadmap follow kare to graduation tak tera profile
+                hoga:<br><br>
+                ✅ <b style="color:var(--accent)">Full Stack Developer</b> — already hai<br>
+                ✅ <b style="color:var(--accent)">ML Engineer</b> — models train karna aata hai<br>
+                ✅ <b style="color:var(--accent)">AI Product Builder</b> — models deploy karna aata hai<br><br>
+                Ye combo 2025-26 mein <b style="color:var(--accent3)">10-30 LPA</b> salary wali jobs ke liye enough hai!
+                🔥</p>
+        </div>
+
+        <div class="scroll-hint">Made with ❤️ — Chalo seekhna shuru karo bhai! 🚀</div>
+    </section>
+
+    <script>
+        // NAV
+        function show( id ) {
+            document.querySelectorAll( '.section' ).forEach( s => s.classList.remove( 'active' ) );
+            document.querySelectorAll( 'nav button' ).forEach( b => b.classList.remove( 'active' ) );
+            document.getElementById( id ).classList.add( 'active' );
+            const btns = document.querySelectorAll( 'nav button' );
+            btns.forEach( b => { if ( b.getAttribute( 'onclick' ) && b.getAttribute( 'onclick' ).includes( id ) ) b.classList.add( 'active' ); } );
+            window.scrollTo( 0, 0 );
+        }
+
+        // NEURON DEMO
+        const layers = [
+            [ { x: 8, y: 30, label: 'x1' }, { x: 8, y: 55, label: 'x2' }, { x: 8, y: 80, label: 'x3' } ],
+            [ { x: 30, y: 20, label: 'h1' }, { x: 30, y: 43, label: 'h2' }, { x: 30, y: 66, label: 'h3' }, { x: 30, y: 89, label: 'h4' } ],
+            [ { x: 55, y: 30, label: 'h5' }, { x: 55, y: 55, label: 'h6' }, { x: 55, y: 80, label: 'h7' } ],
+            [ { x: 80, y: 42, label: 'cat' }, { x: 80, y: 68, label: 'dog' } ]
+        ];
+
+        const layerColors = [ 'input', 'hidden', 'hidden', 'output' ];
+
+        function buildNeuronDemo() {
+            const canvas = document.getElementById( 'neuronCanvas' );
+            const svg = document.getElementById( 'connSvg' );
+            const cw = canvas.offsetWidth, ch = canvas.offsetHeight;
+
+            // Create connections SVG
+            let svgContent = '';
+            for ( let l = 0; l < layers.length - 1; l++ ) {
+                layers[ l ].forEach( ( n1, i ) => {
+                    layers[ l + 1 ].forEach( ( n2, j ) => {
+                        const x1 = n1.x / 100 * cw + 24, y1 = n1.y / 100 * ch;
+                        const x2 = n2.x / 100 * cw, y2 = n2.y / 100 * ch;
+                        svgContent += `<line class="conn" id="conn-${ l }-${ i }-${ j }" x1="${ x1 }" y1="${ y1 }" x2="${ x2 }" y2="${ y2 }"/>`;
+                    } );
+                } );
+            }
+            svg.innerHTML = svgContent;
+
+            // Create neurons
+            layers.forEach( ( layer, li ) => {
+                layer.forEach( ( n, ni ) => {
+                    const el = document.createElement( 'div' );
+                    el.className = `neuron ${ layerColors[ li ] }`;
+                    el.id = `neuron-${ li }-${ ni }`;
+                    el.textContent = n.label;
+                    el.style.left = ( n.x / 100 * cw - 24 ) + 'px';
+                    el.style.top = ( n.y / 100 * ch - 24 ) + 'px';
+                    if ( li === 0 ) {
+                        el.style.cursor = 'pointer';
+                        el.onclick = () => fireNeuron( li, ni );
+                    }
+                    canvas.appendChild( el );
+                } );
+            } );
+        }
+
+        let firing = false;
+        function fireNeuron( li, ni ) {
+            if ( firing ) return;
+            firing = true;
+            // Reset all
+            document.querySelectorAll( '.neuron' ).forEach( n => n.classList.remove( 'active' ) );
+            document.querySelectorAll( '.conn' ).forEach( c => c.classList.remove( 'active' ) );
+
+            const activate = ( layer, idx, delay ) => {
+                setTimeout( () => {
+                    const el = document.getElementById( `neuron-${ layer }-${ idx }` );
+                    if ( el ) el.classList.add( 'active' );
+                    // Activate outgoing connections
+                    if ( layer < layers.length - 1 ) {
+                        layers[ layer + 1 ].forEach( ( _, j ) => {
+                            setTimeout( () => {
+                                const conn = document.getElementById( `conn-${ layer }-${ idx }-${ j }` );
+                                if ( conn ) conn.classList.add( 'active' );
+                                activate( layer + 1, j, 0 );
+                            }, 200 );
+                        } );
+                    }
+                }, delay );
+            };
+
+            activate( li, ni, 0 );
+            setTimeout( () => { firing = false; }, 2000 );
+        }
+
+        // ATTENTION DEMO
+        const attn1 = {
+            0: { high: [], med: [ 1, 2 ], msg: "→ 'The' attends to article-noun pairs" },
+            1: { high: [ 5 ], med: [ 0, 2 ], msg: "→ 'bank' attends HIGH to 'river' → meaning: nadi ka kinara!" },
+            2: { high: [ 1 ], med: [ 0, 3 ], msg: "→ 'was' attends to subject 'bank'" },
+            3: { high: [ 1, 5 ], med: [ 2 ], msg: "→ 'near' attends to both nouns" },
+            4: { high: [], med: [ 5 ], msg: "→ 'the' attends to following noun" },
+            5: { high: [ 1, 3 ], med: [ 2 ], msg: "→ 'river' attends HIGH to 'bank' → confirms nadi context!" },
+        };
+        const attn2 = {
+            0: { high: [ 1 ], med: [ 5 ], msg: "→ 'I' attends to action 'deposited'" },
+            1: { high: [ 2, 5 ], med: [ 0 ], msg: "→ 'deposited' HIGH attention to 'money' and 'bank' → financial context!" },
+            2: { high: [ 1, 5 ], med: [ 0 ], msg: "→ 'money' attends HIGH to 'deposited' → confirms financial transaction" },
+            3: { high: [], med: [ 4, 5 ], msg: "→ 'at' connects 'deposited' to location" },
+            4: { high: [], med: [ 5 ], msg: "→ 'the' attends to following noun" },
+            5: { high: [ 1, 2 ], med: [ 0, 3 ], msg: "→ 'bank' HIGH attention to 'deposited','money' → means bank account!" },
+        };
+
+        function showAttention( sentNum, idx ) {
+            const sent = sentNum === 1 ? 'sent1' : 'sent2';
+            const data = sentNum === 1 ? attn1 : attn2;
+            const chips = document.getElementById( sent ).querySelectorAll( '.word-chip' );
+            const info = data[ idx ];
+
+            chips.forEach( ( c, i ) => {
+                c.classList.remove( 'selected', 'attended', 'attended-high' );
+                if ( i === idx ) c.classList.add( 'selected' );
+                else if ( info.high.includes( i ) ) c.classList.add( 'attended-high' );
+                else if ( info.med.includes( i ) ) c.classList.add( 'attended' );
+            } );
+
+            document.getElementById( `attn-info-${ sentNum }` ).textContent = info.msg;
+        }
+
+        // Init
+        window.addEventListener( 'load', () => { setTimeout( buildNeuronDemo, 100 ); } );
+        window.addEventListener( 'resize', () => {
+            document.querySelectorAll( '.neuron' ).forEach( n => n.remove() );
+            document.getElementById( 'connSvg' ).innerHTML = '';
+            buildNeuronDemo();
+        } );
+    </script>
+</body>
+
+</html>
