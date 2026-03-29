@@ -1,0 +1,52 @@
+<mxfile host="65bd71144e">
+    <diagram id="DH1ryrstsYqCu81AqB97" name="Page-1">
+        <mxGraphModel dx="498" dy="396" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="290" y="160" width="150" height="190" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="Aixs in NumPy" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontStyle=1;fontSize=21;" vertex="1" parent="1">
+                    <mxGeometry x="290" y="30" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="1,2,3,4,5,6,6" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="290" y="160" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="value2" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="290" y="200" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="value3" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="290" y="240" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="valu4" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="290" y="280" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="valu5" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="290" y="320" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="&lt;b&gt;&lt;font style=&quot;font-size: 17px;&quot;&gt;Aixs = direction&lt;/font&gt;&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="285" y="108" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="Aixs = 0" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=20;labelBorderColor=default;labelBackgroundColor=default;" vertex="1" parent="1">
+                    <mxGeometry x="310" y="360" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="&lt;b&gt;&lt;font style=&quot;font-size: 20px;&quot;&gt;Aixs = 1&lt;/font&gt;&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;labelBorderColor=default;" vertex="1" parent="1">
+                    <mxGeometry x="470" y="230" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="Row" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="495" y="200" width="50" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="Col" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="340" y="380" width="40" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="Reshape" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="320" y="540" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="Reshape" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="340" y="550" width="60" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
